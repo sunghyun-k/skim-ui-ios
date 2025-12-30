@@ -7,7 +7,8 @@ import SwiftUI
 /// An action that dismisses the current dialog with animation.
 ///
 /// Access this action via the environment to dismiss a dialog from any child view.
-public struct DialogDismissAction: @unchecked Sendable {
+@MainActor
+public struct DialogDismissAction: Sendable {
     let dismiss: () -> Void
 
     public func callAsFunction() {
@@ -101,7 +102,7 @@ private struct DialogContainer<Content: View>: View {
     @Binding var animationProgress: CGFloat
     let isDismissable: Bool
     let hasBackgroundBlur: Bool
-    let onDismiss: () -> Void
+    let onDismiss: @MainActor () -> Void
     @ViewBuilder let content: () -> Content
 
     var body: some View {
