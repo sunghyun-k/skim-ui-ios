@@ -567,9 +567,7 @@ private struct ChipAvatarView: View {
 
     #Preview("Interactive (onTap)") {
         VStack(spacing: 16) {
-            Chip("Tappable", color: .primary, onTap: {
-                print("Tapped!")
-            })
+            Chip("Tappable", color: .primary, onTap: {})
             Chip("Filter", variant: .bordered, color: .secondary, onTap: {})
             Chip("Both", color: .success, onTap: {}, onClose: {})
         }

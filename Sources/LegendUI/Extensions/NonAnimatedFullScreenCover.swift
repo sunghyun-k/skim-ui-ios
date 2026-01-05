@@ -250,8 +250,6 @@ private struct NonAnimatedFullScreenCoverItemModifier<Item: Identifiable, C: Vie
         }
 
         override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-            print("[PassthroughOverlay] hitTest at \(point), bounds: \(bounds)")
-
             // global 좌표로 변환
             let globalPoint = convert(point, to: nil)
 
@@ -259,24 +257,17 @@ private struct NonAnimatedFullScreenCoverItemModifier<Item: Identifiable, C: Vie
             for frame in hittableFrames {
                 if frame.contains(globalPoint), let hostingView {
                     let convertedPoint = convert(point, to: hostingView)
-                    let result = hostingView.hitTest(convertedPoint, with: event)
-                    print(
-                        "[PassthroughOverlay] → hittable area, hostingView result: \(String(describing: result))",
-                    )
-                    return result
+                    return hostingView.hitTest(convertedPoint, with: event)
                 }
             }
 
             // 나머지는 presentingView로 패스스루
             guard let presentingView else {
-                print("[PassthroughOverlay] presentingView is nil")
                 return nil
             }
 
             let convertedPoint = convert(point, to: presentingView)
-            let result = presentingView.hitTest(convertedPoint, with: event)
-            print("[PassthroughOverlay] → passthrough result: \(String(describing: result))")
-            return result
+            return presentingView.hitTest(convertedPoint, with: event)
         }
     }
 #endif
