@@ -213,7 +213,7 @@ private struct SingleToastView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(toast.title)
-                    .fontStyle(theme.typography.sm)
+                    .fontStyle(theme.typography.sm.weight(.medium))
                     .foregroundStyle(theme.colors.surface.foreground)
 
                 if let message = toast.message {

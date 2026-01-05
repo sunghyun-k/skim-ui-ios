@@ -89,6 +89,17 @@ public struct FontStyle: @unchecked Sendable {
     public var swiftUIFont: Font {
         Font(font)
     }
+
+    /// Returns a new font style with the specified font weight.
+    ///
+    /// - Parameter weight: The font weight to apply.
+    /// - Returns: A new `FontStyle` with the same size and line height but different weight.
+    public func weight(_ weight: PlatformFont.Weight) -> FontStyle {
+        FontStyle(
+            font: .systemFont(ofSize: font.pointSize, weight: weight),
+            lineHeight: lineHeight,
+        )
+    }
 }
 
 // MARK: - Text Extension
