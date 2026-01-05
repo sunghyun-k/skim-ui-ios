@@ -7,8 +7,6 @@ import SwiftUI
 /// This style provides a bordered input field with label, description, and error message support.
 /// It automatically handles focus, disabled, and invalid states with appropriate visual feedback.
 public struct DefaultTextInputStyle: TextInputStyle {
-    @Environment(\.legendTheme) private var theme
-
     private let sizeType: TextInputSizeType
 
     /// Creates a default text input style with the specified size.
@@ -18,18 +16,34 @@ public struct DefaultTextInputStyle: TextInputStyle {
         self.sizeType = size
     }
 
+    public func makeBody(configuration: TextInputStyleConfiguration) -> some View {
+        DefaultTextInputStyleView(
+            configuration: configuration,
+            sizeType: sizeType,
+        )
+    }
+}
+
+// MARK: - DefaultTextInputStyleView
+
+private struct DefaultTextInputStyleView: View {
+    @Environment(\.legendTheme) private var theme
+
+    let configuration: TextInputStyleConfiguration
+    let sizeType: TextInputSizeType
+
     private var size: TextInputSize {
         .resolved(sizeType, layout: theme.layout, typography: theme.typography)
     }
 
-    public func makeBody(configuration: TextInputStyleConfiguration) -> some View {
+    var body: some View {
         VStack(alignment: .leading, spacing: size.spacing) {
             // Label
             if let label = configuration.label {
                 HStack(spacing: 2) {
                     label
                         .fontStyle(size.labelFontStyle)
-                        .foregroundStyle(labelColor(configuration: configuration))
+                        .foregroundStyle(labelColor)
 
                     if configuration.isRequired {
                         Text("*")
@@ -66,7 +80,7 @@ public struct DefaultTextInputStyle: TextInputStyle {
         .animation(.easeInOut(duration: 0.2), value: configuration.isFocused)
     }
 
-    private func labelColor(configuration: TextInputStyleConfiguration) -> Color {
+    private var labelColor: Color {
         if configuration.isInvalid {
             return theme.colors.danger.default
         }

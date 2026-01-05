@@ -32,8 +32,6 @@ public enum SelectHorizontalAlignment: Sendable {
 /// - Note: This style does not work properly on macOS due to window overlay limitations.
 ///   For macOS, consider using ``PickerSelectStyle`` instead.
 public struct DropdownSelectStyle: SelectStyle {
-    @Environment(\.legendTheme) private var theme
-
     private let sizeType: SelectSizeType
     private let placeholder: String
     private let label: String?
@@ -54,11 +52,35 @@ public struct DropdownSelectStyle: SelectStyle {
         self.horizontalAlignment = alignment
     }
 
+    public func makeBody(configuration: SelectStyleConfiguration) -> some View {
+        DropdownSelectStyleView(
+            configuration: configuration,
+            sizeType: sizeType,
+            placeholder: placeholder,
+            label: label,
+            verticalPlacement: verticalPlacement,
+            horizontalAlignment: horizontalAlignment,
+        )
+    }
+}
+
+// MARK: - DropdownSelectStyleView
+
+private struct DropdownSelectStyleView: View {
+    @Environment(\.legendTheme) private var theme
+
+    let configuration: SelectStyleConfiguration
+    let sizeType: SelectSizeType
+    let placeholder: String
+    let label: String?
+    let verticalPlacement: SelectVerticalPlacement
+    let horizontalAlignment: SelectHorizontalAlignment
+
     private var size: SelectSize {
         .resolved(sizeType, layout: theme.layout, typography: theme.typography)
     }
 
-    public func makeBody(configuration: SelectStyleConfiguration) -> some View {
+    var body: some View {
         DropdownSelectView(
             configuration: configuration,
             size: size,

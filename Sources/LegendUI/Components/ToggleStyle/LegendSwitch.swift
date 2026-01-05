@@ -8,14 +8,8 @@ import SwiftUI
 ///
 /// Use `.legendSwitch` or `.legendSwitch(size:isInvalid:)` to apply this style.
 public struct LegendSwitchStyle: ToggleStyle {
-    @Environment(\.isEnabled) private var isEnabled
-    @Environment(\.legendTheme) private var theme
-
     private let sizeType: SwitchSizeType
     private let isInvalid: Bool
-
-    @State private var isHovered = false
-    @State private var isPressed = false
 
     /// Creates a new switch style.
     ///
@@ -30,11 +24,33 @@ public struct LegendSwitchStyle: ToggleStyle {
         self.isInvalid = isInvalid
     }
 
+    public func makeBody(configuration: Configuration) -> some View {
+        LegendSwitchStyleView(
+            configuration: configuration,
+            sizeType: sizeType,
+            isInvalid: isInvalid,
+        )
+    }
+}
+
+// MARK: - LegendSwitchStyleView
+
+private struct LegendSwitchStyleView: View {
+    @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.legendTheme) private var theme
+
+    let configuration: ToggleStyleConfiguration
+    let sizeType: SwitchSizeType
+    let isInvalid: Bool
+
+    @State private var isHovered = false
+    @State private var isPressed = false
+
     private var size: SwitchSize {
         .resolved(sizeType, layout: theme.layout, typography: theme.typography)
     }
 
-    public func makeBody(configuration: Configuration) -> some View {
+    var body: some View {
         HStack(spacing: size.spacing) {
             switchTrack(isOn: configuration.isOn)
             configuration.label

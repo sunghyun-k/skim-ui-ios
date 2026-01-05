@@ -9,19 +9,33 @@ import SwiftUI
 ///
 /// - Important: The `description` property of `SelectItem` is ignored in this style.
 public struct SegmentedSelectStyle: SelectStyle {
-    @Environment(\.legendTheme) private var theme
-
     private let sizeType: SelectSizeType
 
     public init(size: SelectSizeType = .md) {
         self.sizeType = size
     }
 
+    public func makeBody(configuration: SelectStyleConfiguration) -> some View {
+        SegmentedSelectStyleView(
+            configuration: configuration,
+            sizeType: sizeType,
+        )
+    }
+}
+
+// MARK: - SegmentedSelectStyleView
+
+private struct SegmentedSelectStyleView: View {
+    @Environment(\.legendTheme) private var theme
+
+    let configuration: SelectStyleConfiguration
+    let sizeType: SelectSizeType
+
     private var size: SegmentedSelectSize {
         .resolved(sizeType, layout: theme.layout, typography: theme.typography)
     }
 
-    public func makeBody(configuration: SelectStyleConfiguration) -> some View {
+    var body: some View {
         SegmentedContainerView(
             items: configuration.items,
             size: size,

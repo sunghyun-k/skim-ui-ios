@@ -19,8 +19,6 @@ public enum RadioIndicatorPlacement: Sendable {
 /// Displays items in a vertical or horizontal list with circular indicators
 /// that fill when selected. This is the default style for Select.
 public struct RadioSelectStyle: SelectStyle {
-    @Environment(\.legendTheme) private var theme
-
     private let sizeType: SelectSizeType
     private let indicatorPlacement: RadioIndicatorPlacement
 
@@ -32,11 +30,29 @@ public struct RadioSelectStyle: SelectStyle {
         self.indicatorPlacement = indicatorPlacement
     }
 
+    public func makeBody(configuration: SelectStyleConfiguration) -> some View {
+        RadioSelectStyleView(
+            configuration: configuration,
+            sizeType: sizeType,
+            indicatorPlacement: indicatorPlacement,
+        )
+    }
+}
+
+// MARK: - RadioSelectStyleView
+
+private struct RadioSelectStyleView: View {
+    @Environment(\.legendTheme) private var theme
+
+    let configuration: SelectStyleConfiguration
+    let sizeType: SelectSizeType
+    let indicatorPlacement: RadioIndicatorPlacement
+
     private var size: SelectSize {
         .resolved(sizeType, layout: theme.layout, typography: theme.typography)
     }
 
-    public func makeBody(configuration: SelectStyleConfiguration) -> some View {
+    var body: some View {
         let layout = configuration.axis == .vertical
             ? AnyLayout(VStackLayout(alignment: .leading, spacing: size.itemSpacing))
             : AnyLayout(HStackLayout(spacing: size.itemSpacing))

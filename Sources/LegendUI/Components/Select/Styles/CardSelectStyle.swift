@@ -7,19 +7,33 @@ import SwiftUI
 /// Displays items as cards with leading radio indicators. Selected cards show
 /// an accent-colored border and subtle background tint.
 public struct CardSelectStyle: SelectStyle {
-    @Environment(\.legendTheme) private var theme
-
     private let sizeType: SelectSizeType
 
     public init(size: SelectSizeType = .md) {
         self.sizeType = size
     }
 
+    public func makeBody(configuration: SelectStyleConfiguration) -> some View {
+        CardSelectStyleView(
+            configuration: configuration,
+            sizeType: sizeType,
+        )
+    }
+}
+
+// MARK: - CardSelectStyleView
+
+private struct CardSelectStyleView: View {
+    @Environment(\.legendTheme) private var theme
+
+    let configuration: SelectStyleConfiguration
+    let sizeType: SelectSizeType
+
     private var size: SelectSize {
         .resolved(sizeType, layout: theme.layout, typography: theme.typography)
     }
 
-    public func makeBody(configuration: SelectStyleConfiguration) -> some View {
+    var body: some View {
         VStack(spacing: size.itemSpacing) {
             ForEach(configuration.items) { item in
                 CardItemView(

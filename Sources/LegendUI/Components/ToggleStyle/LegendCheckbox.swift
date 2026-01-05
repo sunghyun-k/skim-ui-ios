@@ -8,14 +8,8 @@ import SwiftUI
 ///
 /// Use `.legendCheckbox` or `.legendCheckbox(size:isInvalid:)` to apply this style.
 public struct LegendCheckboxStyle: ToggleStyle {
-    @Environment(\.isEnabled) private var isEnabled
-    @Environment(\.legendTheme) private var theme
-
     private let sizeType: CheckboxSizeType
     private let isInvalid: Bool
-
-    @State private var isHovered = false
-    @State private var isPressed = false
 
     /// Creates a new checkbox style.
     ///
@@ -30,11 +24,33 @@ public struct LegendCheckboxStyle: ToggleStyle {
         self.isInvalid = isInvalid
     }
 
+    public func makeBody(configuration: Configuration) -> some View {
+        LegendCheckboxStyleView(
+            configuration: configuration,
+            sizeType: sizeType,
+            isInvalid: isInvalid,
+        )
+    }
+}
+
+// MARK: - LegendCheckboxStyleView
+
+private struct LegendCheckboxStyleView: View {
+    @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.legendTheme) private var theme
+
+    let configuration: ToggleStyleConfiguration
+    let sizeType: CheckboxSizeType
+    let isInvalid: Bool
+
+    @State private var isHovered = false
+    @State private var isPressed = false
+
     private var size: CheckboxSize {
         .resolved(sizeType, layout: theme.layout, typography: theme.typography)
     }
 
-    public func makeBody(configuration: Configuration) -> some View {
+    var body: some View {
         HStack(spacing: size.spacing) {
             checkboxBox(isOn: configuration.isOn)
             configuration.label
