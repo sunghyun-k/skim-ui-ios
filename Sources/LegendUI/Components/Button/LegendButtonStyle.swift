@@ -320,6 +320,8 @@ private struct LegendButtonStyleView: View {
             var onPressChanged: (Bool) -> Void
             var onTap: () -> Void
 
+            private var initialFrameInWindow: CGRect?
+
             init(
                 isEnabled: Bool,
                 onPressChanged: @escaping (Bool) -> Void,
@@ -331,21 +333,30 @@ private struct LegendButtonStyleView: View {
             }
 
             @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
-                guard isEnabled, let view = gesture.view else { return }
-                let location = gesture.location(in: view)
-                let isInsideView = view.bounds.contains(location)
+                guard isEnabled, let view = gesture.view, let window = view.window else { return }
+                let locationInWindow = gesture.location(in: window)
 
                 switch gesture.state {
                 case .began:
+                    initialFrameInWindow = view.convert(view.bounds, to: window)
                     onPressChanged(true)
                 case .changed:
-                    onPressChanged(isInsideView)
+                    guard let frame = initialFrameInWindow else { return }
+                    if !frame.contains(locationInWindow) {
+                        initialFrameInWindow = nil
+                        onPressChanged(false)
+                        return
+                    }
+                    onPressChanged(true)
                 case .ended:
+                    let shouldTrigger = initialFrameInWindow?.contains(locationInWindow) == true
+                    initialFrameInWindow = nil
                     onPressChanged(false)
-                    if isInsideView {
+                    if shouldTrigger {
                         onTap()
                     }
                 case .cancelled, .failed:
+                    initialFrameInWindow = nil
                     onPressChanged(false)
                 default:
                     break
@@ -367,21 +378,26 @@ private struct LegendButtonStyleView: View {
 #if DEBUG
     #Preview("Variants (Light)") {
         ScrollView {
-            VStack(spacing: 16) {
-                Button("Primary") {}
+            let vstack = VStack(spacing: 16) {
+                Button("Primary") { print("hello") }
                     .buttonStyle(.legend(variant: .primary))
-                Button("Secondary") {}
+                Button("Secondary") { print("hello") }
                     .buttonStyle(.legend(variant: .secondary))
-                Button("Tertiary") {}
+                Button("Tertiary") { print("hello") }
                     .buttonStyle(.legend(variant: .tertiary))
-                Button("Ghost") {}
+                Button("Ghost") { print("hello") }
                     .buttonStyle(.legend(variant: .ghost))
-                Button("Danger") {}
+                Button("Danger") { print("hello") }
                     .buttonStyle(.legend(variant: .danger))
-                Button("Danger Soft") {}
+                Button("Danger Soft") { print("hello") }
                     .buttonStyle(.legend(variant: .dangerSoft))
             }
             .padding()
+
+            vstack
+            vstack
+            vstack
+            vstack
         }
         .preferredColorScheme(.light)
     }
