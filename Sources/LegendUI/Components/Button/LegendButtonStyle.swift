@@ -343,11 +343,10 @@ private struct LegendButtonStyleView: View {
                 case .changed:
                     guard let frame = initialFrameInWindow else { return }
                     if !frame.contains(locationInWindow) {
-                        initialFrameInWindow = nil
-                        onPressChanged(false)
+                        gesture.state = .cancelled
                         return
                     }
-                    onPressChanged(true)
+
                 case .ended:
                     let shouldTrigger = initialFrameInWindow?.contains(locationInWindow) == true
                     initialFrameInWindow = nil
