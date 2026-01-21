@@ -320,7 +320,7 @@ private struct LegendButtonStyleView: View {
             var onPressChanged: (Bool) -> Void
             var onTap: () -> Void
 
-            private var initialFrameInWindow: CGRect?
+            private var panGestures: Set<UIPanGestureRecognizer> = []
 
             init(
                 isEnabled: Bool,
@@ -333,29 +333,29 @@ private struct LegendButtonStyleView: View {
             }
 
             @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
-                guard isEnabled, let view = gesture.view, let window = view.window else { return }
-                let locationInWindow = gesture.location(in: window)
+                guard isEnabled, let view = gesture.view else { return }
+
+                // UIScrollView 등의 panGesture가 드래그 중이면 현재 제스처 취소
+                if panGestures.contains(where: { [.began, .changed].contains($0.state) }) {
+                    gesture.state = .cancelled
+                    onPressChanged(false)
+                    return
+                }
+
+                let location = gesture.location(in: view)
+                let isInsideView = view.bounds.contains(location)
 
                 switch gesture.state {
                 case .began:
-                    initialFrameInWindow = view.convert(view.bounds, to: window)
                     onPressChanged(true)
                 case .changed:
-                    guard let frame = initialFrameInWindow else { return }
-                    if !frame.contains(locationInWindow) {
-                        gesture.state = .cancelled
-                        return
-                    }
-
+                    onPressChanged(isInsideView)
                 case .ended:
-                    let shouldTrigger = initialFrameInWindow?.contains(locationInWindow) == true
-                    initialFrameInWindow = nil
                     onPressChanged(false)
-                    if shouldTrigger {
+                    if isInsideView {
                         onTap()
                     }
                 case .cancelled, .failed:
-                    initialFrameInWindow = nil
                     onPressChanged(false)
                 default:
                     break
@@ -364,9 +364,13 @@ private struct LegendButtonStyleView: View {
 
             func gestureRecognizer(
                 _: UIGestureRecognizer,
-                shouldRecognizeSimultaneouslyWith _: UIGestureRecognizer,
+                shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer,
             ) -> Bool {
-                true
+                // 다른 제스처가 드래그 중인지 확인하기 위해 panGesture 저장
+                if let panGesture = otherGestureRecognizer as? UIPanGestureRecognizer {
+                    panGestures.insert(panGesture)
+                }
+                return true
             }
         }
     }
