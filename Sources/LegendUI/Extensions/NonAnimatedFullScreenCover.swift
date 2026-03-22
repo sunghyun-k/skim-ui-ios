@@ -106,13 +106,8 @@ private struct NonAnimatedFullScreenCoverModifier<C: View>: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .onChange(of: isPresented) { _, newValue in
+            .onChange(of: isPresented, initial: true) { _, newValue in
                 setPresented(newValue)
-            }
-            .onAppear {
-                if isPresented {
-                    setPresented(true)
-                }
             }
         #if os(iOS)
             .fullScreenCover(isPresented: $internalIsPresented, onDismiss: onDismiss) {
@@ -172,13 +167,8 @@ private struct NonAnimatedFullScreenCoverItemModifier<Item: Identifiable, C: Vie
 
     func body(content: Content) -> some View {
         content
-            .onChange(of: item?.id) { _, _ in
+            .onChange(of: item?.id, initial: true) { _, _ in
                 setItem(item)
-            }
-            .onAppear {
-                if item != nil {
-                    setItem(item)
-                }
             }
         #if os(iOS)
             .fullScreenCover(item: $internalItem, onDismiss: onDismiss) { item in
