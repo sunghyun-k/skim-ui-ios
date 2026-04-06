@@ -82,7 +82,7 @@ public struct ButtonSize: Sendable {
                 horizontalPadding: layout.spacing.small + layout.spacing.xSmall,
                 iconOnlyPadding: layout.spacing.small,
                 spacing: layout.spacing.small - 2,
-                cornerRadius: layout.radius.small,
+                cornerRadius: layout.radius.full,
                 fontStyle: typography.sm.weight(.medium),
             )
         case .md:
@@ -91,7 +91,7 @@ public struct ButtonSize: Sendable {
                 horizontalPadding: layout.spacing.medium,
                 iconOnlyPadding: layout.spacing.small + layout.spacing.xSmall,
                 spacing: layout.spacing.small,
-                cornerRadius: layout.radius.medium - 2,
+                cornerRadius: layout.radius.full,
                 fontStyle: typography.base.weight(.medium),
             )
         case .lg:
@@ -100,7 +100,7 @@ public struct ButtonSize: Sendable {
                 horizontalPadding: layout.spacing.large,
                 iconOnlyPadding: layout.spacing.medium,
                 spacing: layout.spacing.small + 2,
-                cornerRadius: layout.radius.medium,
+                cornerRadius: layout.radius.full,
                 fontStyle: typography.lg,
             )
         }

@@ -208,6 +208,77 @@ public struct TextInput<Style: TextInputStyle>: View {
 
 /// Convenience initializers that use `DefaultTextInputStyle` for simpler API usage.
 extension TextInput where Style == DefaultTextInputStyle {
+    /// Creates a text input with a `LocalizedStringResource` label and default styling.
+    public init(
+        _ label: LocalizedStringResource,
+        text: Binding<String>,
+        prompt: LocalizedStringResource? = nil,
+        isRequired: Bool = false,
+        isSecure: Bool = false,
+        isInvalid: Bool = false,
+        isMultiline: Bool = false,
+        size: TextInputSizeType = .md,
+    ) {
+        self.init(
+            String(localized: label),
+            text: text,
+            prompt: prompt.map { String(localized: $0) },
+            isRequired: isRequired,
+            isSecure: isSecure,
+            isInvalid: isInvalid,
+            isMultiline: isMultiline,
+            size: size,
+        )
+    }
+
+    /// Creates a text input without a label, using only a localized prompt as placeholder.
+    public init(
+        text: Binding<String>,
+        prompt: LocalizedStringResource,
+        isRequired: Bool = false,
+        isSecure: Bool = false,
+        isInvalid: Bool = false,
+        isMultiline: Bool = false,
+        size: TextInputSizeType = .md,
+    ) {
+        _text = text
+        self.prompt = String(localized: prompt)
+        self.isRequired = isRequired
+        self.isSecure = isSecure
+        self.isInvalid = isInvalid
+        self.isMultiline = isMultiline
+        self.style = DefaultTextInputStyle(size: size)
+        self.label = nil
+        self.startContent = nil
+        self.endContent = nil
+        self.description = nil
+        self.errorMessage = nil
+    }
+
+    /// Creates a text input without a label, using only a string prompt as placeholder.
+    public init(
+        text: Binding<String>,
+        prompt: String,
+        isRequired: Bool = false,
+        isSecure: Bool = false,
+        isInvalid: Bool = false,
+        isMultiline: Bool = false,
+        size: TextInputSizeType = .md,
+    ) {
+        _text = text
+        self.prompt = prompt
+        self.isRequired = isRequired
+        self.isSecure = isSecure
+        self.isInvalid = isInvalid
+        self.isMultiline = isMultiline
+        self.style = DefaultTextInputStyle(size: size)
+        self.label = nil
+        self.startContent = nil
+        self.endContent = nil
+        self.description = nil
+        self.errorMessage = nil
+    }
+
     /// Creates a text input with a string label and default styling.
     ///
     /// - Parameters:

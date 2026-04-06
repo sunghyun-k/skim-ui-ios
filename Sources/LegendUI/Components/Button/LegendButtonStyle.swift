@@ -16,7 +16,6 @@ public struct LegendButtonStyle: PrimitiveButtonStyle {
     private let customSize: ButtonSize?
     private let isIconOnly: Bool
     private let isFullWidth: Bool
-    private let isCapsule: Bool
 
     /// Creates a button style with predefined variant and size.
     ///
@@ -30,7 +29,6 @@ public struct LegendButtonStyle: PrimitiveButtonStyle {
         size: ButtonSizeType = .md,
         isIconOnly: Bool = false,
         isFullWidth: Bool = true,
-        isCapsule: Bool = false,
     ) {
         self.variantType = variant
         self.customVariant = nil
@@ -38,7 +36,6 @@ public struct LegendButtonStyle: PrimitiveButtonStyle {
         self.customSize = nil
         self.isIconOnly = isIconOnly
         self.isFullWidth = isFullWidth
-        self.isCapsule = isCapsule
     }
 
     /// Creates a button style with a custom variant configuration.
@@ -53,7 +50,6 @@ public struct LegendButtonStyle: PrimitiveButtonStyle {
         size: ButtonSizeType = .md,
         isIconOnly: Bool = false,
         isFullWidth: Bool = true,
-        isCapsule: Bool = false,
     ) {
         self.variantType = nil
         self.customVariant = customVariant
@@ -61,7 +57,6 @@ public struct LegendButtonStyle: PrimitiveButtonStyle {
         self.customSize = nil
         self.isIconOnly = isIconOnly
         self.isFullWidth = isFullWidth
-        self.isCapsule = isCapsule
     }
 
     /// Creates a button style with a custom size configuration.
@@ -76,7 +71,6 @@ public struct LegendButtonStyle: PrimitiveButtonStyle {
         customSize: ButtonSize,
         isIconOnly: Bool = false,
         isFullWidth: Bool = true,
-        isCapsule: Bool = false,
     ) {
         self.variantType = variant
         self.customVariant = nil
@@ -84,7 +78,6 @@ public struct LegendButtonStyle: PrimitiveButtonStyle {
         self.customSize = customSize
         self.isIconOnly = isIconOnly
         self.isFullWidth = isFullWidth
-        self.isCapsule = isCapsule
     }
 
     public func makeBody(configuration: Configuration) -> some View {
@@ -96,7 +89,6 @@ public struct LegendButtonStyle: PrimitiveButtonStyle {
             customSize: customSize,
             isIconOnly: isIconOnly,
             isFullWidth: isFullWidth,
-            isCapsule: isCapsule,
         )
     }
 }
@@ -122,14 +114,12 @@ extension PrimitiveButtonStyle where Self == LegendButtonStyle {
         size: ButtonSizeType = .md,
         isIconOnly: Bool = false,
         isFullWidth: Bool = true,
-        isCapsule: Bool = false,
     ) -> LegendButtonStyle {
         LegendButtonStyle(
             variant: variant,
             size: size,
             isIconOnly: isIconOnly,
             isFullWidth: isFullWidth,
-            isCapsule: isCapsule,
         )
     }
 
@@ -146,14 +136,12 @@ extension PrimitiveButtonStyle where Self == LegendButtonStyle {
         size: ButtonSizeType = .md,
         isIconOnly: Bool = false,
         isFullWidth: Bool = true,
-        isCapsule: Bool = false,
     ) -> LegendButtonStyle {
         LegendButtonStyle(
             customVariant: customVariant,
             size: size,
             isIconOnly: isIconOnly,
             isFullWidth: isFullWidth,
-            isCapsule: isCapsule,
         )
     }
 }
@@ -168,7 +156,6 @@ private struct LegendButtonStyleView: View {
     let customSize: ButtonSize?
     let isIconOnly: Bool
     let isFullWidth: Bool
-    let isCapsule: Bool
 
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.legendTheme) private var theme
@@ -256,25 +243,14 @@ private struct LegendButtonStyleView: View {
 
     @ViewBuilder
     private func backgroundView(isPressed: Bool) -> some View {
-        if isCapsule {
-            Capsule(style: .continuous)
-                .fill(backgroundColor(isPressed: isPressed))
-                .overlay {
-                    if let borderColor = borderColor(isPressed: isPressed) {
-                        Capsule(style: .continuous)
-                            .stroke(borderColor, lineWidth: 1.5)
-                    }
+        RoundedRectangle(cornerRadius: size.cornerRadius, style: .continuous)
+            .fill(backgroundColor(isPressed: isPressed))
+            .overlay {
+                if let borderColor = borderColor(isPressed: isPressed) {
+                    RoundedRectangle(cornerRadius: size.cornerRadius, style: .continuous)
+                        .stroke(borderColor, lineWidth: 1.5)
                 }
-        } else {
-            RoundedRectangle(cornerRadius: size.cornerRadius, style: .continuous)
-                .fill(backgroundColor(isPressed: isPressed))
-                .overlay {
-                    if let borderColor = borderColor(isPressed: isPressed) {
-                        RoundedRectangle(cornerRadius: size.cornerRadius, style: .continuous)
-                            .stroke(borderColor, lineWidth: 1.5)
-                    }
-                }
-        }
+            }
     }
 
     private func backgroundColor(isPressed: Bool) -> Color {
