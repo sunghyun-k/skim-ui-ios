@@ -1,8 +1,8 @@
 import SwiftUI
 
-// MARK: - Color Extensions (Foreground)
+// MARK: - ShapeStyle Extensions (Foreground)
 
-extension Color {
+extension ShapeStyle where Self == Color {
     /// The primary foreground color for text and icons.
     public static var foregroundPrimary: Color { SharedTheme.value.colors.foreground.primary }
 

@@ -1,8 +1,8 @@
 import SwiftUI
 
-// MARK: - Color Extensions (Surface & Background)
+// MARK: - ShapeStyle Extensions (Surface & Background)
 
-extension Color {
+extension ShapeStyle where Self == Color {
     /// The primary surface color for main components.
     public static var surface: Color { SharedTheme.value.colors.surface.primary }
 
@@ -156,7 +156,7 @@ extension View {
                 .overlay { Text("surfaceQuaternary").foregroundStyle(.surfaceForeground) }
         }
         .padding()
-        .background(Color.legendBackground)
+        .background(.legendBackground)
     }
 
     #Preview("Surface Style Modifier (Light)") {
@@ -177,7 +177,7 @@ extension View {
             .surfaceStyle(.default, padding: 24, cornerRadius: 16)
         }
         .padding()
-        .background(Color.legendBackground)
+        .background(.legendBackground)
         .preferredColorScheme(.light)
     }
 
@@ -193,7 +193,7 @@ extension View {
                 .surfaceStyle(.tertiary)
         }
         .padding()
-        .background(Color.legendBackground)
+        .background(.legendBackground)
         .preferredColorScheme(.dark)
     }
 #endif
