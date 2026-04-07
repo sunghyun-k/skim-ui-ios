@@ -153,6 +153,8 @@ private struct LegendCheckboxStyleView: View {
 
 /// A shape that draws an animated checkmark path.
 struct CheckmarkShape: Shape {
+    var layoutDirectionBehavior: LayoutDirectionBehavior { .fixed }
+
     func path(in rect: CGRect) -> Path {
         var path = Path()
         let width = rect.width
