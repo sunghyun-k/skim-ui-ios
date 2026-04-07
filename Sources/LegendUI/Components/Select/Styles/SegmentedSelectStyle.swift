@@ -26,7 +26,7 @@ public struct SegmentedSelectStyle: SelectStyle {
 // MARK: - SegmentedSelectStyleView
 
 private struct SegmentedSelectStyleView: View {
-    @Environment(\.legendTheme) private var theme
+    private var theme: LegendTheme { SharedTheme.value }
 
     let configuration: SelectStyleConfiguration
     let sizeType: SelectSizeType

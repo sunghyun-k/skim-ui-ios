@@ -28,7 +28,7 @@ public enum CheckboxState: Sendable, Equatable {
 /// ```
 public struct IndeterminateCheckbox<Label: View>: View {
     @Environment(\.isEnabled) private var isEnabled
-    @Environment(\.legendTheme) private var theme
+    private var theme: LegendTheme { SharedTheme.value }
 
     @Binding private var state: CheckboxState
     private let sizeType: CheckboxSizeType

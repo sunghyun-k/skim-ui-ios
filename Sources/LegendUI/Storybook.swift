@@ -5,7 +5,7 @@ import SwiftUI
 /// A showcase thumbnail view for LegendUI design system.
 /// Designed for 16:9 aspect ratio, perfect for GIF thumbnails.
 private struct StorybookThumbnail: View {
-    @Environment(\.legendTheme) private var theme
+    private var theme: LegendTheme { SharedTheme.value }
 
     @State private var showDialog = false
     @State private var toasts: [ToastValue] = []

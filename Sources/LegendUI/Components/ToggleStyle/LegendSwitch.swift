@@ -37,7 +37,7 @@ public struct LegendSwitchStyle: ToggleStyle {
 
 private struct LegendSwitchStyleView: View {
     @Environment(\.isEnabled) private var isEnabled
-    @Environment(\.legendTheme) private var theme
+    private var theme: LegendTheme { SharedTheme.value }
 
     let configuration: ToggleStyleConfiguration
     let sizeType: SwitchSizeType

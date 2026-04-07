@@ -38,7 +38,7 @@ public enum SeparatorOrientation: Sendable {
 /// Use `Separator` to create visual boundaries between content sections.
 /// It adapts to the current theme's divider color by default.
 public struct Separator: View {
-    @Environment(\.legendTheme) private var theme
+    private var theme: LegendTheme { SharedTheme.value }
 
     private let variant: SeparatorVariant
     private let orientation: SeparatorOrientation

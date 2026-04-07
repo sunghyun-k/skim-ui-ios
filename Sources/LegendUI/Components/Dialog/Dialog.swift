@@ -147,7 +147,7 @@ private struct DialogContainer<Content: View>: View {
 /// Use this as the root container for your dialog content. It applies the appropriate
 /// background, padding, corner radius, and shadow to match the design system.
 public struct DialogContent<Content: View>: View {
-    @Environment(\.legendTheme) private var theme
+    private var theme: LegendTheme { SharedTheme.value }
 
     @ViewBuilder let content: () -> Content
 
@@ -173,7 +173,7 @@ public struct DialogContent<Content: View>: View {
 ///
 /// Place this at the top of your `DialogContent` to provide a consistent header layout.
 public struct DialogHeader: View {
-    @Environment(\.legendTheme) private var theme
+    private var theme: LegendTheme { SharedTheme.value }
     @Environment(\.dismissDialog) private var dismiss
 
     let title: String
@@ -218,7 +218,7 @@ public struct DialogHeader: View {
 ///
 /// This view applies the standard text styling for dialog body content.
 public struct DialogBody<Content: View>: View {
-    @Environment(\.legendTheme) private var theme
+    private var theme: LegendTheme { SharedTheme.value }
 
     @ViewBuilder let content: () -> Content
 
@@ -239,7 +239,7 @@ public struct DialogBody<Content: View>: View {
 ///
 /// Place action buttons inside this view. Buttons are right-aligned by default.
 public struct DialogFooter<Content: View>: View {
-    @Environment(\.legendTheme) private var theme
+    private var theme: LegendTheme { SharedTheme.value }
 
     @ViewBuilder let content: () -> Content
 

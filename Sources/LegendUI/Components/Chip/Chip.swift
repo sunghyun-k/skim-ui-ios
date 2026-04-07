@@ -8,7 +8,7 @@ import SwiftUI
 /// It supports multiple variants (solid, bordered, flat, etc.) and semantic colors.
 public struct Chip<Content: View, StartContent: View, EndContent: View>: View {
     @Environment(\.isEnabled) private var isEnabled
-    @Environment(\.legendTheme) private var theme
+    private var theme: LegendTheme { SharedTheme.value }
 
     private let content: Content
     private let startContent: StartContent?
@@ -387,7 +387,7 @@ extension Chip where Content == Text, StartContent == AnyView, EndContent == Emp
 // MARK: - Avatar View
 
 private struct ChipAvatarView: View {
-    @Environment(\.legendTheme) private var theme
+    private var theme: LegendTheme { SharedTheme.value }
 
     let image: Image?
     let systemImage: String?

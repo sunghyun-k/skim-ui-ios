@@ -7,7 +7,7 @@ import SwiftUI
 /// Use `Spinner` to indicate that content is loading or an operation is in progress.
 /// The spinner automatically animates when `isLoading` is `true`.
 public struct Spinner: View {
-    @Environment(\.legendTheme) private var theme
+    private var theme: LegendTheme { SharedTheme.value }
 
     private let sizeType: SpinnerSizeType
     private let colorType: SpinnerColorType

@@ -156,7 +156,7 @@ private struct ToastOverlayView: View {
 // MARK: - Single Toast View
 
 private struct SingleToastView: View {
-    @Environment(\.legendTheme) private var theme
+    private var theme: LegendTheme { SharedTheme.value }
 
     let toast: ToastValue
     let indexFromTop: Int?

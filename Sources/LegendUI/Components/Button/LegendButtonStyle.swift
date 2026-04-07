@@ -158,7 +158,7 @@ private struct LegendButtonStyleView: View {
     let isFullWidth: Bool
 
     @Environment(\.isEnabled) private var isEnabled
-    @Environment(\.legendTheme) private var theme
+    private var theme: LegendTheme { SharedTheme.value }
 
     @State private var isPressed = false
     @State private var isHovered = false

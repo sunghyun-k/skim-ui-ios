@@ -24,7 +24,7 @@ public struct CardSelectStyle: SelectStyle {
 // MARK: - CardSelectStyleView
 
 private struct CardSelectStyleView: View {
-    @Environment(\.legendTheme) private var theme
+    private var theme: LegendTheme { SharedTheme.value }
 
     let configuration: SelectStyleConfiguration
     let sizeType: SelectSizeType

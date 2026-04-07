@@ -27,7 +27,7 @@ public struct DefaultTextInputStyle: TextInputStyle {
 // MARK: - DefaultTextInputStyleView
 
 private struct DefaultTextInputStyleView: View {
-    @Environment(\.legendTheme) private var theme
+    private var theme: LegendTheme { SharedTheme.value }
 
     let configuration: TextInputStyleConfiguration
     let sizeType: TextInputSizeType
