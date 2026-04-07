@@ -70,8 +70,7 @@ LegendUI uses a theme system for consistent styling:
 ContentView()
 
 // Or apply custom theme
-ContentView()
-    .legendTheme(customTheme)
+SharedTheme.value = customTheme
 ```
 
 ## Requirements

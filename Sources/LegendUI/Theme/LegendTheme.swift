@@ -5,7 +5,7 @@ import SwiftUI
 /// The root theme configuration containing colors, layout, and typography settings.
 ///
 /// Use this struct to customize the appearance of all LegendUI components.
-/// Apply a theme using the `.legendTheme(_:)` view modifier.
+/// Access the current theme via `SharedTheme.value`.
 public struct LegendTheme: Sendable {
     /// The color palette for the theme.
     public let colors: LegendColors
