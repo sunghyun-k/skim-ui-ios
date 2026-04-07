@@ -1,90 +1,30 @@
 import SwiftUI
 
-// MARK: - Surface
+// MARK: - Color Extensions (Surface & Background)
 
-// MARK: - Surface ShapeStyles
+extension Color {
+    /// The primary surface color for main components.
+    public static var surface: Color { SharedTheme.value.colors.surface.primary }
 
-/// Primary surface background style.
-///
-/// Use this for main content containers and cards.
-/// Automatically adapts to the current theme's primary surface color.
-public struct SurfaceStyle: ShapeStyle {
-    public init() {}
+    /// The foreground color for content on surfaces.
+    public static var surfaceForeground: Color { SharedTheme.value.colors.surface.foreground }
 
-    public func resolve(in _: EnvironmentValues) -> some ShapeStyle {
-        SharedTheme.value.colors.surface.primary
+    /// The secondary surface color for nested containers.
+    public static var surfaceSecondary: Color { SharedTheme.value.colors.surface.secondary }
+
+    /// The tertiary surface color for subtle backgrounds.
+    public static var surfaceTertiary: Color { SharedTheme.value.colors.surface.tertiary }
+
+    /// The quaternary surface color for the most subtle backgrounds.
+    public static var surfaceQuaternary: Color { SharedTheme.value.colors.surface.quaternary }
+
+    /// The primary background color for page-level backgrounds.
+    public static var legendBackground: Color { SharedTheme.value.colors.background.primary }
+
+    /// The secondary background color.
+    public static var legendBackgroundSecondary: Color {
+        SharedTheme.value.colors.background.secondary
     }
-}
-
-/// Foreground color style for text and icons on surfaces.
-///
-/// Use this to ensure readable contrast on any surface variant.
-public struct SurfaceForegroundStyle: ShapeStyle {
-    public init() {}
-
-    public func resolve(in _: EnvironmentValues) -> some ShapeStyle {
-        SharedTheme.value.colors.surface.foreground
-    }
-}
-
-/// Secondary surface background style.
-///
-/// Use this for nested containers or less prominent backgrounds.
-public struct SurfaceSecondaryStyle: ShapeStyle {
-    public init() {}
-
-    public func resolve(in _: EnvironmentValues) -> some ShapeStyle {
-        SharedTheme.value.colors.surface.secondary
-    }
-}
-
-/// Tertiary surface background style.
-///
-/// Use this for subtle backgrounds or hover states.
-public struct SurfaceTertiaryStyle: ShapeStyle {
-    public init() {}
-
-    public func resolve(in _: EnvironmentValues) -> some ShapeStyle {
-        SharedTheme.value.colors.surface.tertiary
-    }
-}
-
-/// Quaternary surface background style.
-///
-/// Use this for the most subtle backgrounds or dividers.
-public struct SurfaceQuaternaryStyle: ShapeStyle {
-    public init() {}
-
-    public func resolve(in _: EnvironmentValues) -> some ShapeStyle {
-        SharedTheme.value.colors.surface.quaternary
-    }
-}
-
-// MARK: - ShapeStyle Extensions
-
-extension ShapeStyle where Self == SurfaceStyle {
-    /// The primary surface background style.
-    public static var surface: SurfaceStyle { SurfaceStyle() }
-}
-
-extension ShapeStyle where Self == SurfaceForegroundStyle {
-    /// The foreground style for content on surfaces.
-    public static var surfaceForeground: SurfaceForegroundStyle { SurfaceForegroundStyle() }
-}
-
-extension ShapeStyle where Self == SurfaceSecondaryStyle {
-    /// The secondary surface background style.
-    public static var surfaceSecondary: SurfaceSecondaryStyle { SurfaceSecondaryStyle() }
-}
-
-extension ShapeStyle where Self == SurfaceTertiaryStyle {
-    /// The tertiary surface background style.
-    public static var surfaceTertiary: SurfaceTertiaryStyle { SurfaceTertiaryStyle() }
-}
-
-extension ShapeStyle where Self == SurfaceQuaternaryStyle {
-    /// The quaternary surface background style.
-    public static var surfaceQuaternary: SurfaceQuaternaryStyle { SurfaceQuaternaryStyle() }
 }
 
 // MARK: - Surface Style ViewModifier
@@ -190,38 +130,6 @@ extension View {
     }
 }
 
-// MARK: - Background ShapeStyles
-
-/// Primary background style for page-level backgrounds.
-public struct BackgroundPrimaryStyle: ShapeStyle {
-    public init() {}
-
-    public func resolve(in _: EnvironmentValues) -> some ShapeStyle {
-        SharedTheme.value.colors.background.primary
-    }
-}
-
-/// Secondary background style.
-public struct BackgroundSecondaryStyle: ShapeStyle {
-    public init() {}
-
-    public func resolve(in _: EnvironmentValues) -> some ShapeStyle {
-        SharedTheme.value.colors.background.secondary
-    }
-}
-
-extension ShapeStyle where Self == BackgroundPrimaryStyle {
-    /// The primary background style for page-level backgrounds.
-    public static var legendBackground: BackgroundPrimaryStyle { BackgroundPrimaryStyle() }
-}
-
-extension ShapeStyle where Self == BackgroundSecondaryStyle {
-    /// The secondary background style.
-    public static var legendBackgroundSecondary: BackgroundSecondaryStyle {
-        BackgroundSecondaryStyle()
-    }
-}
-
 // MARK: - Preview
 
 #if DEBUG
@@ -248,7 +156,7 @@ extension ShapeStyle where Self == BackgroundSecondaryStyle {
                 .overlay { Text("surfaceQuaternary").foregroundStyle(.surfaceForeground) }
         }
         .padding()
-        .background(Color("background", bundle: .module))
+        .background(Color.legendBackground)
     }
 
     #Preview("Surface Style Modifier (Light)") {
@@ -269,7 +177,7 @@ extension ShapeStyle where Self == BackgroundSecondaryStyle {
             .surfaceStyle(.default, padding: 24, cornerRadius: 16)
         }
         .padding()
-        .background(Color("background", bundle: .module))
+        .background(Color.legendBackground)
         .preferredColorScheme(.light)
     }
 
@@ -285,7 +193,7 @@ extension ShapeStyle where Self == BackgroundSecondaryStyle {
                 .surfaceStyle(.tertiary)
         }
         .padding()
-        .background(Color("background", bundle: .module))
+        .background(Color.legendBackground)
         .preferredColorScheme(.dark)
     }
 #endif
