@@ -11,8 +11,8 @@ import SwiftUI
 public struct SurfaceStyle: ShapeStyle {
     public init() {}
 
-    public func resolve(in environment: EnvironmentValues) -> some ShapeStyle {
-        environment.legendTheme.colors.surface.primary
+    public func resolve(in _: EnvironmentValues) -> some ShapeStyle {
+        SharedTheme.value.colors.surface.primary
     }
 }
 
@@ -22,8 +22,8 @@ public struct SurfaceStyle: ShapeStyle {
 public struct SurfaceForegroundStyle: ShapeStyle {
     public init() {}
 
-    public func resolve(in environment: EnvironmentValues) -> some ShapeStyle {
-        environment.legendTheme.colors.surface.foreground
+    public func resolve(in _: EnvironmentValues) -> some ShapeStyle {
+        SharedTheme.value.colors.surface.foreground
     }
 }
 
@@ -33,8 +33,8 @@ public struct SurfaceForegroundStyle: ShapeStyle {
 public struct SurfaceSecondaryStyle: ShapeStyle {
     public init() {}
 
-    public func resolve(in environment: EnvironmentValues) -> some ShapeStyle {
-        environment.legendTheme.colors.surface.secondary
+    public func resolve(in _: EnvironmentValues) -> some ShapeStyle {
+        SharedTheme.value.colors.surface.secondary
     }
 }
 
@@ -44,8 +44,8 @@ public struct SurfaceSecondaryStyle: ShapeStyle {
 public struct SurfaceTertiaryStyle: ShapeStyle {
     public init() {}
 
-    public func resolve(in environment: EnvironmentValues) -> some ShapeStyle {
-        environment.legendTheme.colors.surface.tertiary
+    public func resolve(in _: EnvironmentValues) -> some ShapeStyle {
+        SharedTheme.value.colors.surface.tertiary
     }
 }
 
@@ -55,8 +55,8 @@ public struct SurfaceTertiaryStyle: ShapeStyle {
 public struct SurfaceQuaternaryStyle: ShapeStyle {
     public init() {}
 
-    public func resolve(in environment: EnvironmentValues) -> some ShapeStyle {
-        environment.legendTheme.colors.surface.quaternary
+    public func resolve(in _: EnvironmentValues) -> some ShapeStyle {
+        SharedTheme.value.colors.surface.quaternary
     }
 }
 
@@ -108,7 +108,7 @@ public struct SurfaceModifier: ViewModifier {
         case transparent
     }
 
-    @Environment(\.legendTheme) private var theme
+    private var theme: LegendTheme { SharedTheme.value }
 
     let variant: Variant
     let padding: CGFloat?
@@ -187,6 +187,38 @@ extension View {
             padding: padding,
             cornerRadius: cornerRadius,
         ))
+    }
+}
+
+// MARK: - Background ShapeStyles
+
+/// Primary background style for page-level backgrounds.
+public struct BackgroundPrimaryStyle: ShapeStyle {
+    public init() {}
+
+    public func resolve(in _: EnvironmentValues) -> some ShapeStyle {
+        SharedTheme.value.colors.background.primary
+    }
+}
+
+/// Secondary background style.
+public struct BackgroundSecondaryStyle: ShapeStyle {
+    public init() {}
+
+    public func resolve(in _: EnvironmentValues) -> some ShapeStyle {
+        SharedTheme.value.colors.background.secondary
+    }
+}
+
+extension ShapeStyle where Self == BackgroundPrimaryStyle {
+    /// The primary background style for page-level backgrounds.
+    public static var legendBackground: BackgroundPrimaryStyle { BackgroundPrimaryStyle() }
+}
+
+extension ShapeStyle where Self == BackgroundSecondaryStyle {
+    /// The secondary background style.
+    public static var legendBackgroundSecondary: BackgroundSecondaryStyle {
+        BackgroundSecondaryStyle()
     }
 }
 

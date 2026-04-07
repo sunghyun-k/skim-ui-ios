@@ -8,8 +8,8 @@ import SwiftUI
 public struct ForegroundPrimaryStyle: ShapeStyle {
     public init() {}
 
-    public func resolve(in environment: EnvironmentValues) -> some ShapeStyle {
-        environment.legendTheme.colors.foreground.primary
+    public func resolve(in _: EnvironmentValues) -> some ShapeStyle {
+        SharedTheme.value.colors.foreground.primary
     }
 }
 
@@ -19,8 +19,8 @@ public struct ForegroundPrimaryStyle: ShapeStyle {
 public struct ForegroundSecondaryStyle: ShapeStyle {
     public init() {}
 
-    public func resolve(in environment: EnvironmentValues) -> some ShapeStyle {
-        environment.legendTheme.colors.foreground.secondary
+    public func resolve(in _: EnvironmentValues) -> some ShapeStyle {
+        SharedTheme.value.colors.foreground.secondary
     }
 }
 
@@ -30,8 +30,8 @@ public struct ForegroundSecondaryStyle: ShapeStyle {
 public struct ForegroundMutedStyle: ShapeStyle {
     public init() {}
 
-    public func resolve(in environment: EnvironmentValues) -> some ShapeStyle {
-        environment.legendTheme.colors.foreground.muted
+    public func resolve(in _: EnvironmentValues) -> some ShapeStyle {
+        SharedTheme.value.colors.foreground.muted
     }
 }
 
