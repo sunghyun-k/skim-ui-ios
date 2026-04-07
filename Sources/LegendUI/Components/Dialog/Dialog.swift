@@ -176,14 +176,22 @@ public struct DialogHeader: View {
     private var theme: LegendTheme { SharedTheme.value }
     @Environment(\.dismissDialog) private var dismiss
 
-    let title: String
+    let title: LocalizedStringResource
     var showCloseButton: Bool
 
     public init(
-        title: String,
+        title: LocalizedStringResource,
         showCloseButton: Bool = false,
     ) {
         self.title = title
+        self.showCloseButton = showCloseButton
+    }
+
+    public init(
+        title: some StringProtocol,
+        showCloseButton: Bool = false,
+    ) {
+        self.title = LocalizedStringResource(stringLiteral: String(title))
         self.showCloseButton = showCloseButton
     }
 
@@ -265,16 +273,26 @@ public struct DialogFooter<Content: View>: View {
 public struct DialogCloseButton: View {
     @Environment(\.dismissDialog) private var dismiss
 
-    let title: String
+    let title: LocalizedStringResource
     var variant: ButtonVariantType
     var size: ButtonSizeType
 
     public init(
-        _ title: String,
+        _ title: LocalizedStringResource,
         variant: ButtonVariantType = .ghost,
         size: ButtonSizeType = .md,
     ) {
         self.title = title
+        self.variant = variant
+        self.size = size
+    }
+
+    public init(
+        _ title: some StringProtocol,
+        variant: ButtonVariantType = .ghost,
+        size: ButtonSizeType = .md,
+    ) {
+        self.title = LocalizedStringResource(stringLiteral: String(title))
         self.variant = variant
         self.size = size
     }
