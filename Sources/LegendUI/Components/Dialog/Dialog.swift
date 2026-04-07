@@ -272,7 +272,7 @@ public struct DialogCloseButton: View {
     public init(
         _ title: String,
         variant: ButtonVariantType = .ghost,
-        size: ButtonSizeType = .sm,
+        size: ButtonSizeType = .md,
     ) {
         self.title = title
         self.variant = variant
