@@ -32,7 +32,7 @@ public struct TextInputStyleConfiguration {
     public let text: Binding<String>
 
     /// Placeholder text displayed when the input is empty.
-    public let prompt: String?
+    public let prompt: LocalizedStringResource?
 
     /// Content displayed at the start of the input field (e.g., an icon).
     public let startContent: AnyView?
@@ -68,7 +68,7 @@ public struct TextInputStyleConfiguration {
     public init(
         label: AnyView?,
         text: Binding<String>,
-        prompt: String?,
+        prompt: LocalizedStringResource?,
         startContent: AnyView?,
         endContent: AnyView?,
         description: AnyView?,

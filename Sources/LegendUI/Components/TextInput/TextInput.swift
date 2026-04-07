@@ -13,7 +13,7 @@ public struct TextInput<Style: TextInputStyle>: View {
 
     @Binding private var text: String
     private let label: AnyView?
-    private let prompt: String?
+    private let prompt: LocalizedStringResource?
     private let startContent: AnyView?
     private let endContent: AnyView?
     private let description: AnyView?
@@ -46,7 +46,7 @@ public struct TextInput<Style: TextInputStyle>: View {
         @ViewBuilder label: () -> some View,
     ) {
         _text = text
-        self.prompt = prompt
+        self.prompt = prompt.map { LocalizedStringResource(stringLiteral: $0) }
         self.isRequired = isRequired
         self.isSecure = isSecure
         self.isInvalid = isInvalid
@@ -87,7 +87,7 @@ public struct TextInput<Style: TextInputStyle>: View {
         @ViewBuilder endContent: () -> some View,
     ) {
         _text = text
-        self.prompt = prompt
+        self.prompt = prompt.map { LocalizedStringResource(stringLiteral: $0) }
         self.isRequired = isRequired
         self.isSecure = isSecure
         self.isInvalid = isInvalid
@@ -126,7 +126,7 @@ public struct TextInput<Style: TextInputStyle>: View {
         @ViewBuilder errorMessage: () -> some View,
     ) {
         _text = text
-        self.prompt = prompt
+        self.prompt = prompt.map { LocalizedStringResource(stringLiteral: $0) }
         self.isRequired = isRequired
         self.isSecure = isSecure
         self.isInvalid = isInvalid
@@ -169,7 +169,7 @@ public struct TextInput<Style: TextInputStyle>: View {
         @ViewBuilder errorMessage: () -> some View,
     ) {
         _text = text
-        self.prompt = prompt
+        self.prompt = prompt.map { LocalizedStringResource(stringLiteral: $0) }
         self.isRequired = isRequired
         self.isSecure = isSecure
         self.isInvalid = isInvalid
@@ -219,16 +219,18 @@ extension TextInput where Style == DefaultTextInputStyle {
         isMultiline: Bool = false,
         size: TextInputSizeType = .md,
     ) {
-        self.init(
-            String(localized: label),
-            text: text,
-            prompt: prompt.map { String(localized: $0) },
-            isRequired: isRequired,
-            isSecure: isSecure,
-            isInvalid: isInvalid,
-            isMultiline: isMultiline,
-            size: size,
-        )
+        _text = text
+        self.prompt = prompt
+        self.isRequired = isRequired
+        self.isSecure = isSecure
+        self.isInvalid = isInvalid
+        self.isMultiline = isMultiline
+        self.style = DefaultTextInputStyle(size: size)
+        self.label = AnyView(Text(label))
+        self.startContent = nil
+        self.endContent = nil
+        self.description = nil
+        self.errorMessage = nil
     }
 
     /// Creates a text input without a label, using only a localized prompt as placeholder.
@@ -242,7 +244,7 @@ extension TextInput where Style == DefaultTextInputStyle {
         size: TextInputSizeType = .md,
     ) {
         _text = text
-        self.prompt = String(localized: prompt)
+        self.prompt = prompt
         self.isRequired = isRequired
         self.isSecure = isSecure
         self.isInvalid = isInvalid
@@ -266,7 +268,7 @@ extension TextInput where Style == DefaultTextInputStyle {
         size: TextInputSizeType = .md,
     ) {
         _text = text
-        self.prompt = prompt
+        self.prompt = LocalizedStringResource(stringLiteral: prompt)
         self.isRequired = isRequired
         self.isSecure = isSecure
         self.isInvalid = isInvalid
@@ -301,7 +303,7 @@ extension TextInput where Style == DefaultTextInputStyle {
         size: TextInputSizeType = .md,
     ) {
         _text = text
-        self.prompt = prompt
+        self.prompt = prompt.map { LocalizedStringResource(stringLiteral: $0) }
         self.isRequired = isRequired
         self.isSecure = isSecure
         self.isInvalid = isInvalid
@@ -341,7 +343,7 @@ extension TextInput where Style == DefaultTextInputStyle {
         size: TextInputSizeType = .md,
     ) {
         _text = text
-        self.prompt = prompt
+        self.prompt = prompt.map { LocalizedStringResource(stringLiteral: $0) }
         self.isRequired = isRequired
         self.isSecure = isSecure
         self.isInvalid = isInvalid
@@ -376,7 +378,7 @@ extension TextInput where Style == DefaultTextInputStyle {
         @ViewBuilder label: () -> some View,
     ) {
         _text = text
-        self.prompt = prompt
+        self.prompt = prompt.map { LocalizedStringResource(stringLiteral: $0) }
         self.isRequired = isRequired
         self.isSecure = isSecure
         self.isInvalid = isInvalid
@@ -415,7 +417,7 @@ extension TextInput where Style == DefaultTextInputStyle {
         @ViewBuilder endContent: () -> some View,
     ) {
         _text = text
-        self.prompt = prompt
+        self.prompt = prompt.map { LocalizedStringResource(stringLiteral: $0) }
         self.isRequired = isRequired
         self.isSecure = isSecure
         self.isInvalid = isInvalid
@@ -454,7 +456,7 @@ extension TextInput where Style == DefaultTextInputStyle {
         @ViewBuilder errorMessage: () -> some View,
     ) {
         _text = text
-        self.prompt = prompt
+        self.prompt = prompt.map { LocalizedStringResource(stringLiteral: $0) }
         self.isRequired = isRequired
         self.isSecure = isSecure
         self.isInvalid = isInvalid
@@ -497,7 +499,7 @@ extension TextInput where Style == DefaultTextInputStyle {
         @ViewBuilder errorMessage: () -> some View,
     ) {
         _text = text
-        self.prompt = prompt
+        self.prompt = prompt.map { LocalizedStringResource(stringLiteral: $0) }
         self.isRequired = isRequired
         self.isSecure = isSecure
         self.isInvalid = isInvalid
