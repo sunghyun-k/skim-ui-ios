@@ -118,7 +118,7 @@ private struct ToastOverlayView: View {
                     .transition(.offset(y: transitionOffset))
                 }
             }
-            .animation(.spring, value: presentingToasts.count)
+            .animation(.spring, value: presentingToasts)
             .padding(.horizontal, 16)
             .padding(.top, isBottom ? 0 : 8)
             .padding(.bottom, isBottom ? 8 : 0)
