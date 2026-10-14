@@ -31,7 +31,7 @@ Most of SkimUI is about how things *feel*, not just how they look.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/sunghyun-k/skim-ui-swift", from: "1.1.0"),
+    .package(url: "https://github.com/sunghyun-k/skim-ui-swift", from: "1.2.0"),
 ]
 ```
 
@@ -122,7 +122,7 @@ Prefer `Icon` over SF Symbols, and reach for a symbol only when `Icon` has no fi
 ```swift
 WindowGroup {
     RootView()
-        .installToasts() // once per scene
+        .installToasts() // once per scene; `position: .top` for the top edge
 }
 
 @Environment(\.presentToast) private var presentToast
@@ -139,8 +139,9 @@ presentToast.dismiss(lost.id)
 A title-only toast is a compact capsule; a message or close button makes it a card. The close button appears by default
 only on toasts that don't dismiss themselves (`duration: nil`).
 
-Toasts float in a window of their own at the top of the screen, above navigation bars, sheets, full-screen covers and
-the keyboard. A toast stays when the screen that showed it closes, so a detail screen can confirm "Deleted" and pop.
+Toasts float in a window of their own, above navigation bars, sheets, full-screen covers and the keyboard. They sit at
+the bottom by default — above the tab bar, the home indicator and the keyboard — or below the status bar with
+`installToasts(position: .top)`. A toast stays when the screen that showed it closes, so a detail screen can confirm "Deleted" and pop.
 Touches outside a toast reach the app underneath, and the status bar keeps following the app.
 
 ## Tokens
