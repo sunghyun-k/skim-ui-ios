@@ -13,11 +13,13 @@ public enum TileShape: Sendable, Equatable {
 /// 이름은 아래에, 고른 것만 진하게. 색은 그림이 내고 링은 선택만 알린다.
 ///
 /// `tileWidth`를 주지 않으면 옵션이 한 줄을 나눠 갖고, 주면 그 너비로 가로 스크롤된다 (옵션이 많을 때).
+/// 한 줄을 나눠 가질 때 `maxTileWidth`를 주면 타일이 그보다 커지지 않는다 (iPad처럼 넓은 화면).
 public struct TilePicker<Value: Hashable, Thumbnail: View>: View {
     @Binding var selection: Value
     let options: [Value]
     let shape: TileShape
     let tileWidth: CGFloat?
+    let maxTileWidth: CGFloat?
     let label: (Value) -> String
     let detail: ((Value) -> String)?
     let thumbnail: (Value) -> Thumbnail
@@ -27,6 +29,7 @@ public struct TilePicker<Value: Hashable, Thumbnail: View>: View {
         options: [Value],
         shape: TileShape = .rounded(),
         tileWidth: CGFloat? = nil,
+        maxTileWidth: CGFloat? = nil,
         label: @escaping (Value) -> String,
         detail: ((Value) -> String)? = nil,
         @ViewBuilder thumbnail: @escaping (Value) -> Thumbnail,
@@ -35,6 +38,7 @@ public struct TilePicker<Value: Hashable, Thumbnail: View>: View {
         self.options = options
         self.shape = shape
         self.tileWidth = tileWidth
+        self.maxTileWidth = maxTileWidth
         self.label = label
         self.detail = detail
         self.thumbnail = thumbnail
@@ -45,6 +49,7 @@ public struct TilePicker<Value: Hashable, Thumbnail: View>: View {
         options: [Value],
         shape: TileShape = .rounded(),
         tileWidth: CGFloat? = nil,
+        maxTileWidth: CGFloat? = nil,
         label: @escaping (Value) -> LocalizedStringResource,
         detail: ((Value) -> LocalizedStringResource)? = nil,
         @ViewBuilder thumbnail: @escaping (Value) -> Thumbnail,
@@ -54,6 +59,7 @@ public struct TilePicker<Value: Hashable, Thumbnail: View>: View {
             options: options,
             shape: shape,
             tileWidth: tileWidth,
+            maxTileWidth: maxTileWidth,
             label: { String(localized: label($0)) },
             detail: detail.map { detail in { String(localized: detail($0)) } },
             thumbnail: thumbnail,
@@ -80,6 +86,7 @@ public struct TilePicker<Value: Hashable, Thumbnail: View>: View {
                     isSelected: option == selection,
                     shape: shape,
                     width: tileWidth,
+                    maxWidth: maxTileWidth,
                     label: label(option),
                     detail: detail?(option),
                     thumbnail: thumbnail(option),
@@ -97,6 +104,7 @@ private struct TileButton<Thumbnail: View>: View {
     let isSelected: Bool
     let shape: TileShape
     let width: CGFloat?
+    let maxWidth: CGFloat?
     let label: String
     let detail: String?
     let thumbnail: Thumbnail
@@ -134,7 +142,7 @@ private struct TileButton<Thumbnail: View>: View {
                 }
                 .multilineTextAlignment(.center)
             }
-            .frame(maxWidth: width == nil ? .infinity : nil)
+            .frame(maxWidth: width == nil ? maxWidth ?? .infinity : nil)
             .frame(width: width)
         }
         .buttonStyle(.pressable)
