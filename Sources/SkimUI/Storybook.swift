@@ -19,6 +19,7 @@ public struct Storybook: View {
     @State private var floatingEnabled = true
     @State private var toasts: [ToastValue] = []
     @State private var isLoading = true
+    @State private var tile = 2
 
     public var body: some View {
         NavigationStack {
@@ -225,6 +226,21 @@ public struct Storybook: View {
             .padding(.vertical, Space.l)
             .padding(.horizontal, Space.s)
             .background(CardBackground())
+            TilePicker(
+                selection: $tile,
+                options: [0, 1, 2],
+                label: { ["Light", "Dark", "Auto"][$0] },
+            ) { index in
+                HStack(spacing: 0) {
+                    if index != 1 {
+                        Color(light: 0xFFFFFF, dark: 0xFFFFFF)
+                    }
+                    if index != 0 {
+                        Color(light: 0x1C1C1E, dark: 0x1C1C1E)
+                    }
+                }
+            }
+            .card()
             HStack(spacing: Space.xl) {
                 Toggle("Checkbox", isOn: $checked).toggleStyle(.check)
                 RadioDot(isSelected: checked)
@@ -255,6 +271,14 @@ public struct Storybook: View {
         VStack(alignment: .leading, spacing: Space.m) {
             Banner(icon: .warning, text: "Sync failed. Try again later.", tone: .caution)
             Banner(icon: .info, text: "Everything is up to date.")
+            Banner(
+                icon: .calendar,
+                title: "Calendar access needed",
+                text: "Allow access to show your events in widgets.",
+                actionTitle: "Allow",
+                action: {},
+                onDismiss: {},
+            )
             Notice("Connect an account to see more.", actionTitle: "Connect") {}
             HStack {
                 Text("Loading placeholder").textRole(.body)

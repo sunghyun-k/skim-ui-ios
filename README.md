@@ -108,7 +108,7 @@ Prefer `Icon` over SF Symbols, and reach for a symbol only when `Icon` has no fi
 | Rows | `RowGroup`, `ActionRow`, `LabeledRow`, `Disclosure`, `Notice` |
 | Buttons | `.primary`, `.secondary`, `.ink`, `.destructive`, `.floating` / `.floatingInk` (Liquid Glass), `.quiet`, `.pressable`, `.pressableCard`, `CircleIconButtonStyle`, `.busyLabel(_:)` |
 | Controls | `SegmentedControl`, `SteppedSlider`, `StepProgress`, `.switchTint()`, `.toggleStyle(.check)` |
-| Selection | `SelectChip`, `ChipScroller`, `ChoiceCard`, `OptionRow`, `RadioDot`, `CheckBox`, `SheetHeader` |
+| Selection | `SelectChip`, `ChipScroller`, `ChoiceCard`, `TilePicker`, `OptionRow`, `RadioDot`, `CheckBox`, `SheetHeader` |
 | Form | `Field`, `FieldHeader`, `.textFieldStyle(.field(...))`, `FieldBox`, `FieldSlider`, `RevealButton`, `QuestionHeader`, `.dismissesKeyboardOnTap()` |
 | Feedback | `ToneChip`, `Banner`, `EmptyState`, `.toasts($toasts)`, `.skeleton(isLoading:)` |
 | Gestures | `PressableButton`, `HorizontalDragGesture`, `ScrubGesture` |
