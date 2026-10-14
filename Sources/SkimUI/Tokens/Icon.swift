@@ -18,46 +18,110 @@ public struct Icon: Hashable, @unchecked Sendable {
 }
 
 extension Icon {
+    public static let app = Icon("app", bundle: .module)
+    public static let apps = Icon("apps", bundle: .module)
+    public static let arrowRight = Icon("arrow.right", bundle: .module)
     public static let arrowUpRight = Icon("arrow.up.right", bundle: .module)
     public static let bell = Icon("bell", bundle: .module)
+    public static let bolt = Icon("bolt", bundle: .module)
     public static let calendar = Icon("calendar", bundle: .module)
     public static let chart = Icon("chart", bundle: .module)
     public static let check = Icon("check", bundle: .module)
+    public static let checklist = Icon("checklist", bundle: .module)
     public static let chevronLeft = Icon("chevron.left", bundle: .module)
     public static let chevronRight = Icon("chevron.right", bundle: .module)
+    public static let clock = Icon("clock", bundle: .module)
     public static let close = Icon("close", bundle: .module)
+    public static let copy = Icon("copy", bundle: .module)
+    public static let crown = Icon("crown", bundle: .module)
+    public static let doc = Icon("doc", bundle: .module)
+    public static let download = Icon("download", bundle: .module)
+    public static let envelope = Icon("envelope", bundle: .module)
     public static let exclamation = Icon("exclamation", bundle: .module)
+    public static let eye = Icon("eye", bundle: .module)
+    public static let folder = Icon("folder", bundle: .module)
+    public static let folderPlus = Icon("folder.plus", bundle: .module)
+    public static let gear = Icon("gear", bundle: .module)
+    public static let globe = Icon("globe", bundle: .module)
+    public static let hand = Icon("hand", bundle: .module)
+    public static let house = Icon("house", bundle: .module)
+    public static let infinity = Icon("infinity", bundle: .module)
     public static let info = Icon("info", bundle: .module)
     public static let link = Icon("link", bundle: .module)
+    public static let lock = Icon("lock", bundle: .module)
     public static let minus = Icon("minus", bundle: .module)
+    public static let moon = Icon("moon", bundle: .module)
+    public static let more = Icon("more", bundle: .module)
     public static let pencil = Icon("pencil", bundle: .module)
+    public static let photo = Icon("photo", bundle: .module)
+    public static let play = Icon("play", bundle: .module)
     public static let plus = Icon("plus", bundle: .module)
+    public static let question = Icon("question", bundle: .module)
+    public static let refresh = Icon("refresh", bundle: .module)
     public static let search = Icon("search", bundle: .module)
+    public static let share = Icon("share", bundle: .module)
     public static let sliders = Icon("sliders", bundle: .module)
+    public static let sort = Icon("sort", bundle: .module)
     public static let sparkle = Icon("sparkle", bundle: .module)
+    public static let star = Icon("star", bundle: .module)
+    public static let stop = Icon("stop", bundle: .module)
+    public static let swap = Icon("swap", bundle: .module)
+    public static let tap = Icon("tap", bundle: .module)
     public static let trash = Icon("trash", bundle: .module)
     public static let warning = Icon("warning", bundle: .module)
     public static let widget = Icon("widget", bundle: .module)
 
     /// SkimUI가 가진 아이콘 전부 (갤러리용).
     public static let builtIn: [Icon] = [
+        .app,
+        .apps,
+        .arrowRight,
         .arrowUpRight,
         .bell,
+        .bolt,
         .calendar,
         .chart,
         .check,
+        .checklist,
         .chevronLeft,
         .chevronRight,
+        .clock,
         .close,
+        .copy,
+        .crown,
+        .doc,
+        .download,
+        .envelope,
         .exclamation,
+        .eye,
+        .folder,
+        .folderPlus,
+        .gear,
+        .globe,
+        .hand,
+        .house,
+        .infinity,
         .info,
         .link,
+        .lock,
         .minus,
+        .moon,
+        .more,
         .pencil,
+        .photo,
+        .play,
         .plus,
+        .question,
+        .refresh,
         .search,
+        .share,
         .sliders,
+        .sort,
         .sparkle,
+        .star,
+        .stop,
+        .swap,
+        .tap,
         .trash,
         .warning,
         .widget,
