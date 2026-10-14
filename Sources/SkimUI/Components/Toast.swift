@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // MARK: - Toast Type
 
@@ -14,8 +15,7 @@ public enum ToastType: Sendable {
 
 /// A value that represents a toast notification.
 ///
-/// Create a `ToastValue` and append it to your toast array to display a notification.
-/// Remove it from the array to dismiss the toast.
+/// Pass a `ToastValue` to the `presentToast` environment action to display a notification.
 ///
 /// - Note: Set `duration` to `nil` for a persistent toast that won't auto-dismiss.
 /// - Note: `type` picks the badge color; `icon` replaces the glyph inside it.
@@ -61,33 +61,199 @@ public struct ToastValue: Equatable, Identifiable, Sendable {
     }
 }
 
-// MARK: - Toasts Modifier
+// MARK: - Present Toast Action
 
-private struct ToastsModifier: ViewModifier {
-    @Binding var toasts: [ToastValue]
-    let alignment: Alignment
-    @State private var presentCover = false
-    /// 붙인 뷰의 안전 영역 안쪽 (화면 좌표). 탭 바·툴바·`.bottomBar`·키보드가 저절로 빠진다.
-    @State private var safeFrame: CGRect?
+/// Shows a toast above every window of the scene. Read it from the environment:
+///
+/// ```swift
+/// @Environment(\.presentToast) private var presentToast
+/// presentToast(ToastValue(title: "Saved", type: .success))
+/// ```
+///
+/// - Important: Call `installToasts()` once on the scene's root view. Without it, nothing appears.
+@MainActor
+public struct PresentToastAction {
+    private weak var center: ToastCenter?
+
+    nonisolated init() {}
+
+    init(center: ToastCenter) {
+        self.center = center
+    }
+
+    /// Shows `toast` on top of the toasts already showing.
+    public func callAsFunction(_ toast: ToastValue) {
+        #if DEBUG
+            if center == nil {
+                print("SkimUI: call installToasts() on the root view to use presentToast.")
+            }
+        #endif
+        center?.present(toast)
+    }
+
+    /// Dismisses the toast with `id`. Use it for persistent toasts (`duration: nil`).
+    public func dismiss(_ id: ToastValue.ID) {
+        center?.dismiss(id)
+    }
+}
+
+private struct PresentToastKey: EnvironmentKey {
+    static let defaultValue = PresentToastAction()
+}
+
+extension EnvironmentValues {
+    /// Shows a toast. Available below a view that called `installToasts()`.
+    public internal(set) var presentToast: PresentToastAction {
+        get { self[PresentToastKey.self] }
+        set { self[PresentToastKey.self] = newValue }
+    }
+}
+
+// MARK: - Toast Center
+
+/// 한 장면의 토스트. 창은 마지막 토스트가 다 빠져나간 뒤에 닫는다.
+@MainActor @Observable
+final class ToastCenter {
+    var toasts: [ToastValue] = []
+    private(set) var isPresented = false
+
+    func present(_ toast: ToastValue) {
+        isPresented = true
+        toasts.append(toast)
+        UIAccessibility.post(
+            notification: .announcement,
+            argument: [toast.title, toast.message].compactMap(\.self).joined(separator: ", "),
+        )
+    }
+
+    func dismiss(_ id: ToastValue.ID) {
+        withAnimation(.strongOut) {
+            toasts.removeAll { $0.id == id }
+        }
+    }
+
+    func didFinish() {
+        if toasts.isEmpty {
+            isPresented = false
+        }
+    }
+}
+
+// MARK: - Install Toasts Modifier
+
+private struct InstallToastsModifier: ViewModifier {
+    @State private var center = ToastCenter()
 
     func body(content: Content) -> some View {
         content
-            // 뷰의 프레임은 이미 안전 영역 안쪽이다 (`safeAreaInsets`는 그 바깥으로 뻗을 수 있는 양).
-            .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { safeFrame = $0 }
-            .onChange(of: toasts.isEmpty, initial: true) { _, isEmpty in
-                if !isEmpty {
-                    presentCover = true
-                }
+            .environment(\.presentToast, PresentToastAction(center: center))
+            .background {
+                ToastWindowBridge(center: center, isPresented: center.isPresented)
+                    .allowsHitTesting(false)
             }
-            // 커버는 마지막 토스트가 다 빠져나간 뒤 오버레이가 닫는다.
-            .nonAnimatedFullScreenCover(isPresented: $presentCover) {
-                ToastOverlayView(
-                    toasts: $toasts,
-                    alignment: alignment,
-                    safeFrame: safeFrame,
-                    onFinish: { presentCover = false },
-                )
+    }
+}
+
+/// 장면 뿌리에 깔려 그 장면의 `PassthroughWindow`를 띄우고 닫는다.
+private struct ToastWindowBridge: UIViewRepresentable {
+    let center: ToastCenter
+    let isPresented: Bool
+
+    func makeUIView(context _: Context) -> ToastWindowAnchor {
+        ToastWindowAnchor(center: center)
+    }
+
+    func updateUIView(_ anchor: ToastWindowAnchor, context: Context) {
+        anchor.update(isPresented: isPresented, environment: context.environment)
+    }
+}
+
+/// 떠 있는 창은 SwiftUI 계층 밖이라 환경(색 구성·글자 크기·테마)을 직접 넘긴다.
+private struct ToastWindowRoot: View {
+    let center: ToastCenter
+    let environment: EnvironmentValues
+    let onHittableFramesChange: ([CGRect]) -> Void
+
+    var body: some View {
+        @Bindable var center = center
+        ToastOverlayView(
+            toasts: $center.toasts,
+            onFinish: { center.didFinish() },
+        )
+        .onPreferenceChange(HittableFramesPreferenceKey.self) { onHittableFramesChange($0) }
+        .environment(\.self, environment)
+    }
+}
+
+private final class ToastWindowAnchor: UIView {
+    private let toastCenter: ToastCenter
+    private var isPresented = false
+    private var environment = EnvironmentValues()
+    private var overlayWindow: PassthroughWindow?
+    private var hostingController: StatusBarForwardingHostingController<ToastWindowRoot>?
+
+    init(center: ToastCenter) {
+        self.toastCenter = center
+        super.init(frame: .zero)
+    }
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        if let scene = window?.windowScene {
+            if overlayWindow?.windowScene !== scene {
+                tearDown()
+                overlayWindow = PassthroughWindow(windowScene: scene)
             }
+            updateWindow()
+        } else {
+            tearDown()
+        }
+    }
+
+    func update(isPresented: Bool, environment: EnvironmentValues) {
+        self.isPresented = isPresented
+        self.environment = environment
+        updateWindow()
+    }
+
+    private func updateWindow() {
+        guard let overlayWindow else { return }
+        guard isPresented else {
+            overlayWindow.isHidden = true
+            overlayWindow.rootViewController = nil
+            hostingController = nil
+            return
+        }
+        let root = ToastWindowRoot(center: toastCenter, environment: environment) {
+            [weak overlayWindow] frames in
+            overlayWindow?.hittableFrames = frames
+        }
+        if let hostingController {
+            hostingController.rootView = root
+        } else {
+            let controller = StatusBarForwardingHostingController(rootView: root)
+            controller.view.backgroundColor = .clear
+            overlayWindow.rootViewController = controller
+            hostingController = controller
+        }
+        hostingController?.sourceWindow = window
+        // 상태 표시줄 글자색이 앱 창과 같도록 (`.preferredColorScheme`은 앱 창에 걸린다).
+        overlayWindow.overrideUserInterfaceStyle = window?.overrideUserInterfaceStyle
+            ?? .unspecified
+        overlayWindow.isHidden = false
+        hostingController?.setNeedsStatusBarAppearanceUpdate()
+    }
+
+    private func tearDown() {
+        overlayWindow?.isHidden = true
+        overlayWindow?.rootViewController = nil
+        overlayWindow = nil
+        hostingController = nil
     }
 }
 
@@ -95,28 +261,18 @@ private struct ToastsModifier: ViewModifier {
 
 private struct ToastOverlayView: View {
     @Binding var toasts: [ToastValue]
-    let alignment: Alignment
-    let safeFrame: CGRect?
     let onFinish: () -> Void
     /// 화면에 그리는 토스트. `toasts`를 애니메이션으로 따라가서 퇴장이 끝나는 시점을 안다.
     @State private var shown: [ToastValue] = []
 
-    private var isBottom: Bool {
-        alignment.vertical == .bottom
-    }
-
-    private var transitionOffset: CGFloat {
-        isBottom ? 150 : -150
-    }
-
     var body: some View {
-        ZStack(alignment: alignment) {
+        ZStack(alignment: .top) {
             // 배경: 터치 통과
             Color.clear
                 .ignoresSafeArea()
 
             // Toast 스택
-            ZStack(alignment: alignment) {
+            ZStack(alignment: .top) {
                 ForEach(shown) { item in
                     let indexFromTop = toasts.firstIndex(where: { $0.id == item.id })
                         .map { toasts.count - 1 - $0 }
@@ -125,20 +281,22 @@ private struct ToastOverlayView: View {
                         toast: item,
                         indexFromTop: indexFromTop,
                         totalCount: toasts.count,
-                        isBottom: isBottom,
                         onDismiss: { dismissToast(item.id) },
                     )
                     .hittable()
-                    .transition(.offset(y: transitionOffset))
+                    // 화면 끝 너머로 빠지면서 옅어진다. 잘리는 곳 없이 끝까지 보인다.
+                    .transition(
+                        .offset(y: -120)
+                            .combined(with: .scale(0.8, anchor: .top))
+                            .combined(with: .opacity),
+                    )
                     // 토스트가 사라지면 함께 취소된다.
                     .task { await autoDismiss(item) }
                 }
             }
             .padding(.horizontal, 16)
-            .padding(.top, isBottom ? 0 : 8)
-            .padding(.bottom, isBottom ? 8 : 0)
-            .frame(maxWidth: .infinity, alignment: alignment)
-            .modifier(SafeFramePlacement(safeFrame: safeFrame, alignment: alignment))
+            .padding(.top, 8)
+            .frame(maxWidth: .infinity)
         }
         .onAppear(perform: sync)
         .onChange(of: toasts, sync)
@@ -168,32 +326,12 @@ private struct ToastOverlayView: View {
     }
 }
 
-/// 커버는 기기 안전 영역만 안다. 붙인 뷰의 안전 영역 안쪽에 맞춰 놓는다.
-private struct SafeFramePlacement: ViewModifier {
-    let safeFrame: CGRect?
-    let alignment: Alignment
-
-    func body(content: Content) -> some View {
-        if let safeFrame {
-            GeometryReader { _ in
-                content
-                    .frame(width: safeFrame.width, height: safeFrame.height, alignment: alignment)
-                    .offset(x: safeFrame.minX, y: safeFrame.minY)
-            }
-            .ignoresSafeArea()
-        } else {
-            content
-        }
-    }
-}
-
 // MARK: - Single Toast View
 
 private struct SingleToastView: View {
     let toast: ToastValue
     let indexFromTop: Int?
     let totalCount: Int
-    let isBottom: Bool
     let onDismiss: () -> Void
 
     @State private var dragOffset: CGFloat = 0
@@ -214,8 +352,7 @@ private struct SingleToastView: View {
     }
 
     private var yOffset: CGFloat {
-        let baseOffset = clampedIndex * 8
-        return isBottom ? -baseOffset + dragOffset : baseOffset + dragOffset
+        clampedIndex * 8 + dragOffset
     }
 
     private var opacity: CGFloat {
@@ -236,15 +373,14 @@ private struct SingleToastView: View {
                     .onChanged { value in
                         guard isTopmost else { return }
                         let height = value.translation.height
-                        // 닫는 쪽은 손가락을 그대로 따라가고, 반대쪽은 sqrt로 끈끈하게 버틴다.
-                        dragOffset = towardDismiss(height) > 0
+                        // 닫는 쪽(위)은 손가락을 그대로 따라가고, 아래로는 sqrt로 끈끈하게 버틴다.
+                        dragOffset = height < 0
                             ? height
                             : (height < 0 ? -1 : 1) * sqrt(abs(height)) * 3
                     }
                     .onEnded { value in
                         if isTopmost,
-                           towardDismiss(value.translation.height) > 50
-                           || towardDismiss(value.velocity.height) > 300
+                           -value.translation.height > 50 || -value.velocity.height > 300
                         {
                             dismiss()
                         }
@@ -254,11 +390,6 @@ private struct SingleToastView: View {
                     },
             )
             .animation(.spring(duration: 0.35, bounce: 0.15), value: indexFromTop)
-    }
-
-    /// 세로 이동을 닫는 방향 기준으로 바꾼다 (양수 = 닫는 쪽).
-    private func towardDismiss(_ height: CGFloat) -> CGFloat {
-        isBottom ? height : -height
     }
 
     private func dismiss() {
@@ -384,17 +515,14 @@ extension View {
 // MARK: - View Extension
 
 extension View {
-    /// Displays toast notifications from a binding array.
+    /// Shows toasts presented with the `presentToast` environment action below this view.
     ///
-    /// Toasts are displayed when added to the array and dismissed when removed.
-    /// Users can also dismiss toasts by swiping (up for top alignment, down for bottom).
-    ///
-    /// - Parameters:
-    ///   - toasts: A binding to the array of toast values to display.
-    ///   - alignment: The screen edge where toasts appear. Defaults to `.top`.
-    ///                Use `.bottom` for bottom-aligned toasts.
-    public func toasts(_ toasts: Binding<[ToastValue]>, alignment: Alignment = .top) -> some View {
-        modifier(ToastsModifier(toasts: toasts, alignment: alignment))
+    /// Call it once on the scene's root view. Toasts float in a window above everything in the
+    /// scene — navigation bars, sheets and full-screen covers — at the top of the screen,
+    /// and stay when the screen that presented them goes away. Touches outside a toast pass
+    /// through.
+    public func installToasts() -> some View {
+        modifier(InstallToastsModifier())
     }
 }
 
@@ -403,6 +531,7 @@ extension View {
 #if DEBUG
     #Preview("Toast") {
         ToastPreview()
+            .installToasts()
     }
 
     #Preview("Toast Styles") {
@@ -434,7 +563,6 @@ extension View {
                         toast: toast,
                         indexFromTop: 0,
                         totalCount: 1,
-                        isBottom: false,
                         onDismiss: {},
                     )
                 }
@@ -446,7 +574,8 @@ extension View {
     }
 
     private struct ToastPreview: View {
-        @State private var toasts: [ToastValue] = []
+        @Environment(\.presentToast) private var presentToast
+        @State private var count = 0
 
         var body: some View {
             ZStack {
@@ -463,8 +592,9 @@ extension View {
                         ]
                         let randomIndex = Int.random(in: 0 ..< types.count)
 
-                        toasts.append(ToastValue(
-                            title: "Toast \(toasts.count + 1)",
+                        count += 1
+                        presentToast(ToastValue(
+                            title: "Toast \(count)",
                             message: messages[randomIndex],
                             type: types[randomIndex],
                             duration: 5.0,
@@ -472,18 +602,13 @@ extension View {
                     }
                     .buttonStyle(.primary(.regular))
 
-                    Button("Clear All") {
-                        toasts.removeAll()
+                    Button("Compact") {
+                        presentToast(ToastValue(title: "Copied to clipboard", type: .success))
                     }
                     .buttonStyle(.secondary(.small))
-
-                    Text("Active toasts: \(toasts.count)")
-                        .textRole(.caption)
-                        .foregroundStyle(Palette.ink3)
                 }
                 .padding()
             }
-            .toasts($toasts, alignment: .top)
         }
     }
 #endif

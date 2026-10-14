@@ -1,6 +1,7 @@
 import SwiftUI
 
 /// 컴포넌트 갤러리. 전부 만져 볼 수 있다. 앱의 디버그 화면에 띄우거나 #Preview로 본다.
+/// 토스트는 앱 뿌리의 `installToasts()`로 뜬다.
 public struct Storybook: View {
     public init() {}
 
@@ -17,9 +18,10 @@ public struct Storybook: View {
     @State private var isOn = true
     @State private var checked = true
     @State private var floatingEnabled = true
-    @State private var toasts: [ToastValue] = []
+    @Environment(\.presentToast) private var presentToast
     @State private var isLoading = true
     @State private var tile = 2
+    @State private var isCovering = false
 
     public var body: some View {
         NavigationStack {
@@ -51,7 +53,6 @@ public struct Storybook: View {
             .navigationBarTitleDisplayMode(.inline)
         }
         .tint(Palette.ink1)
-        .toasts($toasts)
     }
 
     private func group(_ title: String, @ViewBuilder content: () -> some View) -> some View {
@@ -272,6 +273,34 @@ public struct Storybook: View {
 
     private var feedback: some View {
         VStack(alignment: .leading, spacing: Space.m) {
+            HStack(spacing: Space.s) {
+                Button("Toast") {
+                    presentToast(ToastValue(title: "Copied to clipboard", type: .success))
+                }
+                .buttonStyle(.secondary(.small))
+                // 토스트가 떠 있는 동안 상태 표시줄을 숨긴 커버가 열렸다 닫혀도 상태 표시줄이 따라가는지.
+                Button("Toast over a cover") {
+                    presentToast(ToastValue(
+                        title: "Status bar follows the app",
+                        message: "A cover hides it and closes in a second.",
+                        duration: 5,
+                    ))
+                    isCovering = true
+                }
+                .buttonStyle(.secondary(.small))
+            }
+            .fullScreenCover(isPresented: $isCovering) {
+                Text("Status bar hidden")
+                    .textRole(.title)
+                    .foregroundStyle(Palette.ink1)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .screenBackground()
+                    .statusBarHidden()
+                    .task {
+                        try? await Task.sleep(for: .seconds(1.5))
+                        isCovering = false
+                    }
+            }
             Banner(icon: .warning, text: "Sync failed. Try again later.", tone: .caution)
             Banner(icon: .info, text: "Everything is up to date.")
             Banner(
@@ -295,7 +324,7 @@ public struct Storybook: View {
                 message: "Items you add will show up here.",
             ) {
                 Button("Add item") {
-                    toasts.append(ToastValue(
+                    presentToast(ToastValue(
                         title: "Added",
                         message: "The item was added.",
                         type: .success,
@@ -329,10 +358,12 @@ public struct Storybook: View {
 
 #Preview("Dark") {
     Storybook()
+        .installToasts()
         .preferredColorScheme(.dark)
 }
 
 #Preview("Light") {
     Storybook()
+        .installToasts()
         .preferredColorScheme(.light)
 }

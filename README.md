@@ -21,7 +21,8 @@ Most of SkimUI is about how things *feel*, not just how they look.
   the knob stretches and the track presses in while you hold it. − / + buttons on both sides.
 - **Numbers roll, gauges fill.** Values animate with `.numericText()` and gauges fill with a fast-start, soft-stop curve
   (`strongOut`) whenever they change.
-- **Toasts you can flick away.** `.toasts($toasts)` stacks them, dismisses them on a timer or a swipe,
+- **Toasts you can flick away.** `presentToast` shows them above every screen, sheet and cover — they stay when
+  the screen that showed them closes — stacks them, dismisses them on a timer or a swipe,
   and shows a compact capsule for one-liners.
 - **Gestures that don't fight scrolling.** `HorizontalDragGesture` (segments) and `ScrubGesture` (long-press and drag
   across a chart) decide direction before the scroll view does, so vertical scrolling keeps working.
@@ -37,6 +38,7 @@ dependencies: [
 ## Quick start
 
 Pick your accent color once at launch — in the app *and* in every extension — before any view is drawn.
+Install toasts once on the scene's root view.
 
 ```swift
 import SkimUI
@@ -48,13 +50,16 @@ struct MyApp: App {
     }
 
     var body: some Scene {
-        WindowGroup { UsageScreen() }
+        WindowGroup {
+            UsageScreen()
+                .installToasts()
+        }
     }
 }
 
 struct UsageScreen: View {
+    @Environment(\.presentToast) private var presentToast
     @State private var limit = 5
-    @State private var toasts: [ToastValue] = []
 
     var body: some View {
         ScrollView {
@@ -73,12 +78,11 @@ struct UsageScreen: View {
         .screenBackground()
         .bottomBar {
             Button("Save") {
-                toasts.append(ToastValue(title: "Saved", type: .success))
+                presentToast(ToastValue(title: "Saved", type: .success))
             }
             .buttonStyle(.floating)
             .padding(.horizontal, Space.gutter)
         }
-        .toasts($toasts)
     }
 }
 ```
@@ -110,27 +114,34 @@ Prefer `Icon` over SF Symbols, and reach for a symbol only when `Icon` has no fi
 | Controls | `SegmentedControl`, `SteppedSlider`, `StepProgress`, `.switchTint()`, `.toggleStyle(.check)` |
 | Selection | `SelectChip`, `ChipScroller`, `ChoiceCard`, `TilePicker`, `OptionRow`, `RadioDot`, `CheckBox`, `SheetHeader` |
 | Form | `Field`, `FieldHeader`, `.textFieldStyle(.field(...))`, `FieldBox`, `FieldSlider`, `RevealButton`, `QuestionHeader`, `.dismissesKeyboardOnTap()` |
-| Feedback | `ToneChip`, `Banner`, `EmptyState`, `.toasts($toasts)`, `.skeleton(isLoading:)` |
+| Feedback | `ToneChip`, `Banner`, `EmptyState`, `.installToasts()` + `presentToast`, `.skeleton(isLoading:)` |
 | Gestures | `PressableButton`, `HorizontalDragGesture`, `ScrubGesture` |
 
 ### Toasts
 
 ```swift
-@State private var toasts: [ToastValue] = []
+WindowGroup {
+    RootView()
+        .installToasts() // once per scene
+}
 
-content.toasts($toasts) // top by default; `alignment: .bottom` for the bottom edge
+@Environment(\.presentToast) private var presentToast
 
-toasts.append(ToastValue(title: "Copied to clipboard", type: .success))
-toasts.append(ToastValue(title: "Storage almost full", message: "Free up space to keep syncing.", type: .warning))
-toasts.append(ToastValue(title: "Connection lost", type: .danger, duration: nil)) // stays until closed
+presentToast(ToastValue(title: "Copied to clipboard", type: .success))
+presentToast(ToastValue(title: "Storage almost full", message: "Free up space to keep syncing.", type: .warning))
+
+let lost = ToastValue(title: "Connection lost", type: .danger, duration: nil) // stays until closed
+presentToast(lost)
+presentToast.dismiss(lost.id)
 ```
 
 `type` picks the badge color (`.default`, `.success`, `.warning`, `.danger`) and `icon:` swaps the glyph inside it.
 A title-only toast is a compact capsule; a message or close button makes it a card. The close button appears by default
 only on toasts that don't dismiss themselves (`duration: nil`).
 
-Toasts follow the safe area of the view you attach them to — no manual insets. Attach `.toasts` inside a `TabView` or
-`NavigationStack` and they clear the tab bar, navigation bar and toolbars automatically. A sheet gets its own `.toasts`.
+Toasts float in a window of their own at the top of the screen, above navigation bars, sheets, full-screen covers and
+the keyboard. A toast stays when the screen that showed it closes, so a detail screen can confirm "Deleted" and pop.
+Touches outside a toast reach the app underneath, and the status bar keeps following the app.
 
 ## Tokens
 
