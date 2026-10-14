@@ -176,6 +176,14 @@ public struct Storybook: View {
                 LabeledRow("Renews", value: "Dec 31, 2026", note: "In 78 days")
                 LabeledRow("Note", value: "Not set", isMuted: true)
             }
+            RowGroup("FAQ") {
+                ExpandableRow("Why did the total change?") {
+                    Text("Usage from the last 24 hours is still being counted by your carrier.")
+                }
+                ExpandableRow("Can I change the reset day?") {
+                    Text("Open the plan and pick a new reset day. Past periods stay as they are.")
+                }
+            }
         }
     }
 

@@ -51,6 +51,7 @@ icons={
  'minus': [fill(rr(4,10.75,16,2.5,1.25))],
  'plus': [fill(rr(10.75,4,2.5,16,1.25)), fill(rr(4,10.75,16,2.5,1.25))],
  'chevron.right': [stroke('M9.5 5.5L16 12L9.5 18.5',2.6)],
+ 'chevron.down': [stroke('M5.5 9.5L12 16L18.5 9.5',2.6)],
  'chevron.left': [stroke('M14.5 5.5L8 12L14.5 18.5',2.6)],
  'search': [fill(circ(10.5,10.5,7.2)+circ(10.5,10.5,4.5),'evenodd'), stroke('M15.8 15.8L20.2 20.2',2.8)],
  'check': [stroke('M5 12.5L9.7 17L19 7.5',2.6)],

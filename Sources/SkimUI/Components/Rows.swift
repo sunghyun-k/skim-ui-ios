@@ -10,6 +10,76 @@ public struct Disclosure: View {
     }
 }
 
+/// 누르면 아래로 내용을 펼치는 행 (자주 묻는 질문). 오른쪽 ⌄가 펼치면 위로 돈다.
+/// `Disclosure`(›)는 다른 화면으로 넘어가는 행의 표시라, 제자리에서 펼치는 행은 ⌄로 구분한다.
+/// `RowGroup` 안에서는 행 사이 선을 묶음이 긋고, 질문마다 따로인 카드는 행마다 `RowGroup`으로 감싼다.
+/// 한 번에 하나만 펼치려면 `isExpanded`를 넘겨 부르는 쪽이 상태를 쥔다.
+public struct ExpandableRow<Content: View>: View {
+    let title: String
+    let externalIsExpanded: Binding<Bool>?
+    let content: Content
+
+    @State private var ownIsExpanded = false
+    @Environment(\.isInRowGroup) private var isInRowGroup
+
+    public init(_ title: String, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.externalIsExpanded = nil
+        self.content = content()
+    }
+
+    public init(_ title: String, isExpanded: Binding<Bool>, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.externalIsExpanded = isExpanded
+        self.content = content()
+    }
+
+    private var isExpanded: Binding<Bool> {
+        externalIsExpanded ?? $ownIsExpanded
+    }
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Button {
+                withAnimation(.strongOut) { isExpanded.wrappedValue.toggle() }
+            } label: {
+                HStack(spacing: Space.m) {
+                    Text(title)
+                        .textRole(.body)
+                        .foregroundStyle(Palette.ink1)
+                        .multilineTextAlignment(.leading)
+                    Spacer(minLength: Space.s)
+                    IconView(.chevronDown, size: 13)
+                        .foregroundStyle(Palette.ink4)
+                        .rotationEffect(.degrees(isExpanded.wrappedValue ? 180 : 0))
+                }
+                .padding(.vertical, Space.m)
+                .frame(minHeight: 54)
+                .rowGroupInset()
+            }
+            .buttonStyle(.pressableRow)
+            .accessibilityValue(Text(
+                isExpanded.wrappedValue
+                    ? String(localized: "Expanded", bundle: .module)
+                    : String(localized: "Collapsed", bundle: .module),
+            ))
+            if isExpanded.wrappedValue {
+                content
+                    .textRole(.callout)
+                    .foregroundStyle(Palette.ink2)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.bottom, Space.l)
+                    .rowGroupInset()
+                    .transition(.opacity)
+            }
+            if !isInRowGroup {
+                Hairline()
+            }
+        }
+    }
+}
+
 /// 카드 위 작은 제목 ("오늘", "이번 기간"). 카드 밖, 왼쪽 정렬.
 public struct SectionTitle: View {
     let text: String

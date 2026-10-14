@@ -19,6 +19,18 @@
         "ko" : { "stringUnit" : { "state" : "translated", "value" : "닫기" } }
       }
     },
+    "Collapsed" : {
+      "comment" : "Accessibility value of an expandable row while its content is hidden.",
+      "localizations" : {
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "접힘" } }
+      }
+    },
+    "Expanded" : {
+      "comment" : "Accessibility value of an expandable row while its content is shown.",
+      "localizations" : {
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "펼쳐짐" } }
+      }
+    },
     "Not set" : {
       "comment" : "Shown in place of a value when an optional slider is empty.",
       "localizations" : {

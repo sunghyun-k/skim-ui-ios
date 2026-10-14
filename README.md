@@ -109,7 +109,7 @@ Prefer `Icon` over SF Symbols, and reach for a symbol only when `Icon` has no fi
 |---|---|
 | Surfaces | `.screenBackground()`, `.card()`, `CardBackground`, `.formSection()`, `.bottomBar { }`, `Hairline` |
 | Text & numbers | `ValueText`, `SectionTitle`, `StatSplit`, `MeterRow`, `LinearGauge` |
-| Rows | `RowGroup`, `ActionRow`, `LabeledRow`, `Disclosure`, `Notice` |
+| Rows | `RowGroup`, `ActionRow`, `LabeledRow`, `ExpandableRow`, `Disclosure`, `Notice` |
 | Buttons | `.primary`, `.secondary`, `.ink`, `.destructive`, `.floating` / `.floatingInk` (Liquid Glass), `.quiet`, `.pressable`, `.pressableRow`, `.pressableCard`, `CircleIconButtonStyle`, `.busyLabel(_:)` |
 | Controls | `SegmentedControl`, `SteppedSlider`, `StepProgress`, `.switchTint()`, `.toggleStyle(.check)` |
 | Selection | `SelectChip`, `ChipScroller`, `ChoiceCard`, `TilePicker`, `OptionRow`, `RadioDot`, `CheckBox`, `SheetHeader` |

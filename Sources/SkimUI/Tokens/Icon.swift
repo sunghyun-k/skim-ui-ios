@@ -28,6 +28,7 @@ extension Icon {
     public static let chart = Icon("chart", bundle: .module)
     public static let check = Icon("check", bundle: .module)
     public static let checklist = Icon("checklist", bundle: .module)
+    public static let chevronDown = Icon("chevron.down", bundle: .module)
     public static let chevronLeft = Icon("chevron.left", bundle: .module)
     public static let chevronRight = Icon("chevron.right", bundle: .module)
     public static let clock = Icon("clock", bundle: .module)
@@ -83,6 +84,7 @@ extension Icon {
         .chart,
         .check,
         .checklist,
+        .chevronDown,
         .chevronLeft,
         .chevronRight,
         .clock,

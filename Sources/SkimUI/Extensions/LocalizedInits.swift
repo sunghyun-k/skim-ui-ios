@@ -364,6 +364,22 @@ extension ActionRow where Leading == EmptyView {
     }
 }
 
+extension ExpandableRow {
+    @_disfavoredOverload
+    public init(_ title: LocalizedStringResource, @ViewBuilder content: () -> Content) {
+        self.init(String(localized: title), content: content)
+    }
+
+    @_disfavoredOverload
+    public init(
+        _ title: LocalizedStringResource,
+        isExpanded: Binding<Bool>,
+        @ViewBuilder content: () -> Content,
+    ) {
+        self.init(String(localized: title), isExpanded: isExpanded, content: content)
+    }
+}
+
 extension Notice {
     @_disfavoredOverload
     public init(
@@ -422,6 +438,8 @@ extension ToastValue {
         _ = ActionRow("literal", subtitle: "sub")
         _ = ActionRow(key, subtitle: key)
         _ = ActionRow(key) { EmptyView() } trailing: { EmptyView() }
+        _ = ExpandableRow("literal") { EmptyView() }
+        _ = ExpandableRow(key, isExpanded: .constant(true)) { EmptyView() }
         _ = EmptyState(icon: .chevronRight, title: "literal", message: "message")
         _ = EmptyState(icon: .chevronRight, title: key, message: key)
         _ = Field("literal") { EmptyView() }
