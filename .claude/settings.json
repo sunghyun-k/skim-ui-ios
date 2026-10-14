@@ -1,7 +1,0 @@
-{
-  "enabledPlugins": {
-    "apple-dev-docs@claude-swift-plugins": true,
-    "format-swift@claude-swift-plugins": true,
-    "xcassets-manager@claude-swift-plugins": true
-  }
-}

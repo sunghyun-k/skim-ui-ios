@@ -6,3 +6,8 @@ DerivedData/
 .swiftpm/configuration/registries.json
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 .netrc
+/Tools/HeaderMaker.swiftpm/.swiftpm
+/Tools/HeaderMaker.swiftpm/Package.resolved
+/Package.resolved
+/.vscode/
+/.claude/

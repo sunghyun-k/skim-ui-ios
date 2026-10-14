@@ -1,0 +1,37 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    " (Optional)" : {
+      "comment" : "Suffix after a form field title when the field may be left empty.",
+      "localizations" : {
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : " (선택)" } }
+      }
+    },
+    "Clear" : {
+      "comment" : "Button that clears an optional slider value.",
+      "localizations" : {
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "지우기" } }
+      }
+    },
+    "Close" : {
+      "comment" : "Accessibility label of the toast close button.",
+      "localizations" : {
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "닫기" } }
+      }
+    },
+    "Not set" : {
+      "comment" : "Shown in place of a value when an optional slider is empty.",
+      "localizations" : {
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "입력 안 함" } }
+      }
+    },
+    "Step %lld of %lld" : {
+      "comment" : "Accessibility label of the step progress indicator. First: current step, second: step count.",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Step %1$lld of %2$lld" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "%2$lld단계 중 %1$lld단계" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}
