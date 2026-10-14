@@ -30,7 +30,7 @@ Most of SkimUI is about how things *feel*, not just how they look.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/sunghyun-k/skim-ui-swift", from: "1.0.0"),
+    .package(url: "https://github.com/sunghyun-k/skim-ui-swift", from: "1.1.0"),
 ]
 ```
 
