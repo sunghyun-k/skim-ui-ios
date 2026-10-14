@@ -293,6 +293,28 @@ extension PrimitiveButtonStyle where Self == PressableStyle {
     }
 }
 
+/// `RowGroup` 안 행 전체를 누르는 버튼 (`ActionRow`를 감싼 `Button`·`NavigationLink`).
+/// 살짝만 줄고 흐려진다 — 넓은 행에서 0.96은 출렁거려 보이고, 많이 줄면 묶음 카드에서 그 행만 떨어져 보인다.
+public struct PressableRowStyle: PrimitiveButtonStyle {
+    public init() {}
+
+    public func makeBody(configuration: Configuration) -> some View {
+        PressableButton(configuration) { isPressed in
+            configuration.label
+                .contentShape(.rect)
+                .scaleEffect(isPressed ? 0.99 : 1)
+                .opacity(isPressed ? 0.6 : 1)
+                .animation(.press, value: isPressed)
+        }
+    }
+}
+
+extension PrimitiveButtonStyle where Self == PressableRowStyle {
+    public static var pressableRow: PressableRowStyle {
+        PressableRowStyle()
+    }
+}
+
 /// 카드 전체를 누르는 버튼 — 큰 면이라 0.96이면 출렁거려 보여서 0.985.
 public struct PressableCardStyle: PrimitiveButtonStyle {
     public init() {}

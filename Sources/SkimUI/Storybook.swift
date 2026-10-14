@@ -163,7 +163,10 @@ public struct Storybook: View {
                 ActionRow("Notifications", subtitle: "Daily summary at 9 AM") {
                     Toggle("", isOn: $isOn).labelsHidden().switchTint()
                 }
-                ActionRow("History") { Disclosure() }
+                Button {} label: {
+                    ActionRow("History") { Disclosure() }
+                }
+                .buttonStyle(.pressableRow)
                 ActionRow("Version") { Text("1.0.0") }
                 ActionRow("Delete all data", isDestructive: true)
             }
