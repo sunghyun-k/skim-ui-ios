@@ -429,6 +429,11 @@ private struct SingleToastView: View {
         (isBottom ? -1 : 1) * clampedIndex * 8 + dragOffset
     }
 
+    /// 뒤에 깔린 토스트는 가장자리만. 유리 너머로 글자가 비치지 않게 내용을 숨긴다.
+    private var contentOpacity: CGFloat {
+        isTopmost || indexFromTop == nil ? 1 : 0
+    }
+
     private var opacity: CGFloat {
         if (indexFromTop ?? 0) > 3 {
             return 0
@@ -486,11 +491,11 @@ private struct SingleToastView: View {
                     .foregroundStyle(Palette.ink1)
                     .lineLimit(1)
             }
+            .opacity(contentOpacity)
             .padding(.leading, Space.s)
             .padding(.trailing, Space.l + 2)
             .padding(.vertical, Space.s)
-            .background(Palette.raised, in: .capsule)
-            .floatingShadow()
+            .toastSurface(in: .capsule)
         } else {
             HStack(spacing: Space.m) {
                 ToastBadge(toast: toast)
@@ -522,12 +527,12 @@ private struct SingleToastView: View {
                     .accessibilityLabel(Text(String(localized: "Close", bundle: .module)))
                 }
             }
+            .opacity(contentOpacity)
             .padding(.leading, Space.m)
             .padding(.trailing, Space.l)
             .padding(.vertical, Space.m)
             .frame(maxWidth: 400)
-            .background(Palette.raised, in: .rect(cornerRadius: Radius.card, style: .continuous))
-            .floatingShadow()
+            .toastSurface(in: .rect(cornerRadius: Radius.card, style: .continuous))
         }
     }
 }
@@ -587,7 +592,18 @@ private struct ToastBadge: View {
 
 extension View {
     /// 떠 있는 것의 얕은 그림자. 화면 어디에 떠도 경계가 보일 만큼만.
-    fileprivate func floatingShadow() -> some View {
+    /// iOS 26은 탭 바·떠 있는 버튼과 같은 Liquid Glass, 그 전은 떠 있는 면 + 그림자.
+    @ViewBuilder
+    fileprivate func toastSurface(in shape: some Shape) -> some View {
+        if #available(iOS 26, *) {
+            glassEffect(.regular, in: shape)
+        } else {
+            background(Palette.raised, in: shape)
+                .floatingShadow()
+        }
+    }
+
+    private func floatingShadow() -> some View {
         shadow(color: Palette.popShadow.opacity(0.8), radius: 14, y: 4)
     }
 }
