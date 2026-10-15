@@ -31,7 +31,7 @@ Most of SkimUI is about how things *feel*, not just how they look.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/sunghyun-k/skim-ui-swift", from: "1.2.3"),
+    .package(url: "https://github.com/sunghyun-k/skim-ui-ios", from: "1.2.3"),
 ]
 ```
 
@@ -190,7 +190,7 @@ Label("Lines", icon: .sim) // tab bars, menus and toolbars keep their system loo
 
 ## Development
 
-- **Build:** iOS only — `xcodebuild build -scheme skim-ui-swift -destination 'generic/platform=iOS Simulator'`.
+- **Build:** iOS only — `xcodebuild build -scheme skim-ui-ios -destination 'generic/platform=iOS Simulator'`.
 - **Icons:** the SVG source is `Tools/icons.py`. Edit it, run `python3 Tools/icons.py`, and add a static member to `Icon`.
 - **Header image:** `Tools/HeaderMaker.swiftpm` draws it from real components. Run `Tools/make-header.sh` to rebuild
   `docs/header-light.png` and `docs/header-dark.png` on a simulator.

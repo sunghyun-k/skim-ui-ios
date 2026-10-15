@@ -2,7 +2,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "skim-ui-swift",
+    name: "skim-ui-ios",
     defaultLocalization: "en",
     platforms: [
         .iOS(.v18),

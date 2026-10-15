@@ -12,7 +12,7 @@ iOS 18+ SwiftUI 디자인 시스템 (토큰 + 컴포넌트). 원칙·토큰·컴
 iOS 전용이라 `swift build`(macOS)는 안 된다. 고친 파일은 `swiftformat`으로 정리한다.
 
 ```bash
-xcodebuild build -scheme skim-ui-swift -destination 'generic/platform=iOS Simulator' -quiet 2>&1 | grep -E "error:|warning:"
+xcodebuild build -scheme skim-ui-ios -destination 'generic/platform=iOS Simulator' -quiet 2>&1 | grep -E "error:|warning:"
 ```
 
 ## 규칙
