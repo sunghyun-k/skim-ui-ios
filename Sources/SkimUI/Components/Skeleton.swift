@@ -126,20 +126,29 @@ private struct SkeletonModifier: ViewModifier {
     let animation: SkeletonAnimation
 
     func body(content: Content) -> some View {
-        if isLoading {
-            switch animation {
-            case .shimmer(let duration):
-                content.modifier(ShimmerEffect(duration: duration))
-            case .pulse(let duration, let minOpacity, let maxOpacity):
-                content.modifier(PulseEffect(
-                    duration: duration,
-                    minOpacity: minOpacity,
-                    maxOpacity: maxOpacity,
-                ))
-            case .none:
-                content
+        // 로딩이 끝나면 내용이 짧게 겹쳐 나타난다 (한 프레임에 바뀌면 깜빡여 보인다).
+        ZStack {
+            if isLoading {
+                loading(content).transition(.opacity)
+            } else {
+                content.transition(.opacity)
             }
-        } else {
+        }
+        .animation(.soft, value: isLoading)
+    }
+
+    @ViewBuilder
+    private func loading(_ content: Content) -> some View {
+        switch animation {
+        case .shimmer(let duration):
+            content.modifier(ShimmerEffect(duration: duration))
+        case .pulse(let duration, let minOpacity, let maxOpacity):
+            content.modifier(PulseEffect(
+                duration: duration,
+                minOpacity: minOpacity,
+                maxOpacity: maxOpacity,
+            ))
+        case .none:
             content
         }
     }
@@ -152,6 +161,8 @@ extension View {
     ///
     /// Use this modifier to show placeholder animations while content is loading.
     /// The skeleton effect masks the view with an animated overlay.
+    /// When `isLoading` changes, the skeleton and the content cross-fade briefly
+    /// (`Animation.soft`).
     ///
     /// - Parameters:
     ///   - isLoading: When `true`, the skeleton animation is displayed.
