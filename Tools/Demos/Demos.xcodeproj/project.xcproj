@@ -1,0 +1,99 @@
+{
+  "default-configuration": "Debug",
+  "configurations": [
+    "Debug",
+    "Release",
+  ],
+  "localizations": {
+    "development": "en",
+    "supported": [
+      "Base",
+      "en",
+    ],
+  },
+  "packages": [
+    { "kind": "local", "path": "../.." },
+  ],
+  "files": [
+    { "kind": "folder", "path": "Demos", "target-membership": [ "Demos" ] },
+    { "kind": "folder", "path": "DemosUITests", "target-membership": [ "DemosUITests" ] },
+    {
+      "kind": "group",
+      "name": "Products",
+      "children": [
+        { "path": "<PRODUCTS>/Demos.app", "id": "D3A0000000000000000000A1", "type": "wrapper.application", "index": false },
+        { "path": "<PRODUCTS>/DemosUITests.xctest", "id": "D3A0000000000000000000A2", "type": "wrapper.cfbundle", "index": false },
+      ],
+    },
+  ],
+  "targets": [
+    {
+      "name": "Demos",
+      "id": "D3A0000000000000000000B1",
+      "product": "Products/Demos.app",
+      "product-type": "application",
+      "build-phases": [
+        "compile-sources",
+        "frameworks",
+        "resources",
+      ],
+      "package-product-members": [
+        {
+          "product-name": "SkimUI",
+          "build-phase": { "build-phase": "frameworks" },
+        },
+      ],
+      "build-settings": {
+        "GENERATE_INFOPLIST_FILE": "YES",
+        "INFOPLIST_KEY_UIApplicationSceneManifest_Generation": "YES",
+        "INFOPLIST_KEY_UILaunchScreen_Generation": "YES",
+        "INFOPLIST_KEY_UISupportedInterfaceOrientations": "UIInterfaceOrientationPortrait",
+        "LD_RUNPATH_SEARCH_PATHS": [
+          "$(inherited)",
+          "@executable_path/Frameworks",
+        ],
+        "PRODUCT_BUNDLE_IDENTIFIER": "local.skimui.demos",
+        "PRODUCT_NAME": "$(TARGET_NAME)",
+        "TARGETED_DEVICE_FAMILY": "1",
+      },
+    }, {
+      "name": "DemosUITests",
+      "id": "D3A0000000000000000000B2",
+      "product": "Products/DemosUITests.xctest",
+      "product-type": "bundle.ui-testing",
+      "dependencies": [
+        "Demos",
+      ],
+      "build-phases": [
+        "compile-sources",
+        "frameworks",
+        "resources",
+      ],
+      "build-settings": {
+        "GENERATE_INFOPLIST_FILE": "YES",
+        "LD_RUNPATH_SEARCH_PATHS": [
+          "$(inherited)",
+          "@executable_path/Frameworks",
+          "@loader_path/Frameworks",
+        ],
+        "PRODUCT_BUNDLE_IDENTIFIER": "local.skimui.demos.uitests",
+        "PRODUCT_NAME": "$(TARGET_NAME)",
+        "TARGETED_DEVICE_FAMILY": "1",
+        "TEST_TARGET_NAME": "Demos",
+      },
+    },
+  ],
+  "build-settings": {
+    "ALWAYS_SEARCH_USER_PATHS": "NO",
+    "CODE_SIGN_STYLE": "Automatic",
+    "IPHONEOS_DEPLOYMENT_TARGET": "18.0",
+    "ONLY_ACTIVE_ARCH[config=Debug]": "YES",
+    "SDKROOT": "iphoneos",
+    "SWIFT_ACTIVE_COMPILATION_CONDITIONS[config=Debug]": "DEBUG $(inherited)",
+    "SWIFT_OPTIMIZATION_LEVEL[config=Debug]": "-Onone",
+    "SUPPORTED_PLATFORMS": "iphoneos iphonesimulator",
+    "SWIFT_VERSION": "6.0",
+  },
+  "last-upgrade": "27.0",
+  "last-swift-update": "27.0",
+}

@@ -1,6 +1,6 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/header-dark.png">
-  <img alt="SkimUI — a tactile SwiftUI design system for utility apps" src="docs/header-light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/c90f923b-a885-4891-a4ab-829f3a5cb861">
+  <img alt="SkimUI — a tactile SwiftUI design system for utility apps" src="https://github.com/user-attachments/assets/0ee1aa1d-b808-483a-9612-bfb884fd718b">
 </picture>
 
 # SkimUI
@@ -27,11 +27,29 @@ Most of SkimUI is about how things *feel*, not just how they look.
 - **Gestures that don't fight scrolling.** `HorizontalDragGesture` (segments) and `ScrubGesture` (long-press and drag
   across a chart) decide direction before the scroll view does, so vertical scrolling keeps working.
 
+<table>
+  <tr>
+    <td colspan="2"><img src="https://github.com/user-attachments/assets/7f51aaa9-ae7c-45c9-97d3-21aa72798e83" alt="Toasts: a compact capsule, then cards that stack; the top one is closed with its button"><br><sub>Toasts</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="https://github.com/user-attachments/assets/d383fd90-94a7-4885-87ea-a096baf8ca15" alt="SteppedSlider: the knob stretches and the track presses in while it is dragged"><br><sub><code>SteppedSlider</code></sub></td>
+    <td width="50%"><img src="https://github.com/user-attachments/assets/b1a8c3bb-dc47-41dd-91d9-b7d457eacce5" alt="SegmentedControl: tapping and dragging the pill, the number rolls and the gauge fills"><br><sub><code>SegmentedControl</code> · <code>ValueText</code> · <code>LinearGauge</code></sub></td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/383d3632-b052-4fcf-8829-c6cf20d79b90" alt="SelectChip, ChoiceCard and check toggles changing selection"><br><sub><code>SelectChip</code> · <code>ChoiceCard</code> · <code>.toggleStyle(.check)</code></sub></td>
+    <td><img src="https://github.com/user-attachments/assets/bcc290e6-e62a-4e39-890f-79570d6052ca" alt="TilePicker with picture tiles and round gradient tiles"><br><sub><code>TilePicker</code></sub></td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/e3b5aa0a-f946-48c0-81f4-e5f8492ed46f" alt="ExpandableRow opening one row at a time"><br><sub><code>ExpandableRow</code></sub></td>
+    <td><img src="https://github.com/user-attachments/assets/af6864f4-0ad8-4bba-9da5-3c5a74b652f0" alt="A card loading with a skeleton shimmer, then fading into its content"><br><sub><code>.skeleton(isLoading:)</code></sub></td>
+  </tr>
+</table>
+
 ## Installation
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/sunghyun-k/skim-ui-ios", from: "1.2.3"),
+    .package(url: "https://github.com/sunghyun-k/skim-ui-ios", from: "1.0.0"),
 ]
 ```
 
@@ -193,7 +211,11 @@ Label("Lines", icon: .sim) // tab bars, menus and toolbars keep their system loo
 - **Build:** iOS only — `xcodebuild build -scheme skim-ui-ios -destination 'generic/platform=iOS Simulator'`.
 - **Icons:** the SVG source is `Tools/icons.py`. Edit it, run `python3 Tools/icons.py`, and add a static member to `Icon`.
 - **Header image:** `Tools/HeaderMaker.swiftpm` draws it from real components. Run `Tools/make-header.sh` to rebuild
-  `docs/header-light.png` and `docs/header-dark.png` on a simulator.
+  `Tools/out/header-light.webp` and `header-dark.webp` on a simulator.
+- **Demo animations:** `Tools/Demos` is a demo app whose UI tests tap and drag each screen. Run `Tools/make-demos.sh`
+  (or `Tools/make-demos.sh toast slider`) to record them on a simulator into `Tools/out/demo-*.webp`.
+- **Images aren't committed.** Drop the files from `Tools/out/` into a GitHub issue comment (no need to post it) and
+  put the `user-attachments` URLs into this README. The scripts need `ffmpeg` and `webp` (`brew install ffmpeg webp`).
 
 ## License
 

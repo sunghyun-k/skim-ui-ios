@@ -1,7 +1,9 @@
 #!/bin/bash
-# README 헤더(docs/header-light.png, header-dark.png)를 다시 만든다.
+# README 헤더를 다시 만든다 → Tools/out/header-{light,dark}.webp (무손실)
+# 저장소에는 넣지 않는다. GitHub 이슈 댓글에 올려 생긴 주소를 README에 쓴다.
 # 사용법: Tools/make-header.sh ["시뮬레이터 이름"]  (기본: 사용 가능한 첫 iPhone)
 set -euo pipefail
+command -v cwebp >/dev/null || { echo "cwebp 가 없다: brew install webp" >&2; exit 1; }
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 BUNDLE=local.skimui.headermaker
 DERIVED=$(mktemp -d)
@@ -36,6 +38,9 @@ for _ in $(seq 30); do
 done
 xcrun simctl terminate "$UDID" "$BUNDLE" 2>/dev/null || true
 
-mkdir -p "$ROOT/docs"
-cp "$DATA"/Documents/{header-light,header-dark}.png "$ROOT/docs/"
-ls -1 "$ROOT"/docs/{header-light,header-dark}.png
+OUT="$ROOT/Tools/out"
+mkdir -p "$OUT"
+for name in header-light header-dark; do
+    cwebp -quiet -lossless -z 9 "$DATA/Documents/$name.png" -o "$OUT/$name.webp"
+done
+ls -1 "$OUT"/{header-light,header-dark}.webp

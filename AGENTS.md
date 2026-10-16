@@ -26,4 +26,8 @@ xcodebuild build -scheme skim-ui-ios -destination 'generic/platform=iOS Simulato
 - 라이브러리 안의 문구는 `String(localized: "...", bundle: .module)` + `Resources/Localizable.xcstrings` (en 기준, ko 번역).
 - 아이콘은 `Tools/icons.py`가 원본. 고친 뒤 `python3 Tools/icons.py`.
 - 컴포넌트를 더하면 `Storybook`과 README 표에도 넣는다.
-- README 헤더 이미지는 `Tools/HeaderMaker.swiftpm`이 원본. 고친 뒤 `Tools/make-header.sh` → `docs/`.
+- README 이미지는 저장소에 넣지 않는다 (SwiftPM이 저장소를 통째로 받는다). `Tools/out/`에 만든 뒤 사용자가 GitHub 이슈
+  댓글에 올려 생긴 `user-attachments` 주소를 README에 쓴다.
+  - 헤더: `Tools/HeaderMaker.swiftpm`이 원본. 고친 뒤 `Tools/make-header.sh`.
+  - 데모 애니메이션: `Tools/Demos`(데모 앱 + 손가락을 움직이는 UI 테스트)가 원본. 보이는 동작을 바꾸면
+    `Tools/make-demos.sh [데모 이름]`.
