@@ -4,16 +4,28 @@
 
 ## 프로젝트 개요
 
-iOS 18+ SwiftUI 디자인 시스템 (토큰 + 컴포넌트). 원칙·토큰·컴포넌트 목록은 README.
+iOS 18+ · macOS 26+ SwiftUI 디자인 시스템 (토큰 + 컴포넌트). 원칙·토큰·컴포넌트 목록은 README.
 여러 앱이 같이 쓴다 — 앱 고유 색·아이콘·도메인 컴포넌트는 각 앱에 둔다.
 
 ## 빌드
 
-iOS 전용이라 `swift build`(macOS)는 안 된다. 고친 파일은 `swiftformat`으로 정리한다.
+iOS·macOS 둘 다 빌드한다. 고친 파일은 `swiftformat`으로 정리한다.
 
 ```bash
 xcodebuild build -scheme skim-ui-ios -destination 'generic/platform=iOS Simulator' -quiet 2>&1 | grep -E "error:|warning:"
+xcodebuild build -scheme skim-ui-ios -destination 'generic/platform=macOS' -quiet 2>&1 | grep -E "error:|warning:"
 ```
+
+## macOS
+
+- 최소 버전: iOS 는 18 그대로 둔다(다른 앱이 쓴다). macOS 는 26.
+- UIKit 에 기대는 곳은 `#if os(iOS)` 로 나누고 macOS 는 SwiftUI·AppKit 으로 대신한다. iOS 동작은 바꾸지 않는다.
+  - 색(`Color(light:dark:)`): `NSColor(name:dynamicProvider:)` + `NSAppearance.bestMatch`.
+  - `PressableButton`·`ScrubGesture`·`HorizontalDragGesture`: `DragGesture(minimumDistance: 0)`. 마우스 끌기는 스크롤과 겹치지 않아
+    길게 누르기·방향 판정·겹친 버튼 고르기가 없다(안쪽 버튼 제스처가 먼저 받는다).
+  - 토스트: 떠 있는 통과 창(`PassthroughWindow`) 대신 `installToasts()` 를 건 뷰 위에 겹친다. 시트·다른 창 위로는 뜨지 않는다.
+  - `dismissesKeyboardOnTap()`: 아무것도 하지 않는다.
+- iOS 전용 수식어(`navigationBarTitleDisplayMode`, `keyboardType`, `fullScreenCover`, `statusBarHidden` 등)는 `#if os(iOS)` 안에 둔다.
 
 ## 규칙
 

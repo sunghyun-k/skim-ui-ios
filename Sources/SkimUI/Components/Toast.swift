@@ -1,5 +1,7 @@
 import SwiftUI
-import UIKit
+#if os(iOS)
+    import UIKit
+#endif
 
 // MARK: - Toast Type
 
@@ -130,10 +132,12 @@ final class ToastCenter {
     func present(_ toast: ToastValue) {
         isPresented = true
         toasts.append(toast)
-        UIAccessibility.post(
-            notification: .announcement,
-            argument: [toast.title, toast.message].compactMap(\.self).joined(separator: ", "),
-        )
+        let announcement = [toast.title, toast.message].compactMap(\.self).joined(separator: ", ")
+        #if os(iOS)
+            UIAccessibility.post(notification: .announcement, argument: announcement)
+        #else
+            AccessibilityNotification.Announcement(announcement).post()
+        #endif
     }
 
     func dismiss(_ id: ToastValue.ID) {
@@ -158,6 +162,7 @@ private struct InstallToastsModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .environment(\.presentToast, PresentToastAction(center: center))
+        #if os(iOS)
             .background {
                 ToastWindowBridge(
                     center: center,
@@ -166,152 +171,168 @@ private struct InstallToastsModifier: ViewModifier {
                 )
                 .allowsHitTesting(false)
             }
-    }
-}
-
-/// 장면 뿌리에 깔려 그 장면의 `PassthroughWindow`를 띄우고 닫는다.
-private struct ToastWindowBridge: UIViewRepresentable {
-    let center: ToastCenter
-    let position: ToastPosition
-    let isPresented: Bool
-
-    func makeUIView(context _: Context) -> ToastWindowAnchor {
-        ToastWindowAnchor(center: center)
-    }
-
-    func updateUIView(_ anchor: ToastWindowAnchor, context: Context) {
-        anchor.update(
-            position: position,
-            isPresented: isPresented,
-            environment: context.environment,
-        )
-    }
-}
-
-/// 떠 있는 창은 SwiftUI 계층 밖이라 환경(색 구성·글자 크기·테마)을 직접 넘긴다.
-private struct ToastWindowRoot: View {
-    let center: ToastCenter
-    let position: ToastPosition
-    let environment: EnvironmentValues
-    let bottomObstruction: () -> CGFloat
-    let onHittableFramesChange: ([CGRect]) -> Void
-
-    var body: some View {
-        @Bindable var center = center
-        ToastOverlayView(
-            toasts: $center.toasts,
-            position: position,
-            bottomObstruction: bottomObstruction,
-            onFinish: { center.didFinish() },
-        )
-        .onPreferenceChange(HittableFramesPreferenceKey.self) { onHittableFramesChange($0) }
-        .environment(\.self, environment)
-    }
-}
-
-private final class ToastWindowAnchor: UIView {
-    private let toastCenter: ToastCenter
-    private var position = ToastPosition.bottom
-    private var isPresented = false
-    private var environment = EnvironmentValues()
-    private var overlayWindow: PassthroughWindow?
-    private var hostingController: StatusBarForwardingHostingController<ToastWindowRoot>?
-
-    init(center: ToastCenter) {
-        self.toastCenter = center
-        super.init(frame: .zero)
-    }
-
-    @available(*, unavailable)
-    required init?(coder _: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override func didMoveToWindow() {
-        super.didMoveToWindow()
-        if let scene = window?.windowScene {
-            if overlayWindow?.windowScene !== scene {
-                tearDown()
-                overlayWindow = PassthroughWindow(windowScene: scene)
+        #else
+            // macOS: 창마다 내용 위에 겹친다 (시트·다른 창 위로 띄우는 통과 창은 iOS 만).
+            .overlay {
+                if center.isPresented {
+                    @Bindable var center = center
+                    ToastOverlayView(
+                        toasts: $center.toasts,
+                        position: position,
+                        bottomObstruction: { 0 },
+                        onFinish: { center.didFinish() },
+                    )
+                }
             }
+        #endif
+    }
+}
+
+#if os(iOS)
+    /// 장면 뿌리에 깔려 그 장면의 `PassthroughWindow`를 띄우고 닫는다.
+    private struct ToastWindowBridge: UIViewRepresentable {
+        let center: ToastCenter
+        let position: ToastPosition
+        let isPresented: Bool
+
+        func makeUIView(context _: Context) -> ToastWindowAnchor {
+            ToastWindowAnchor(center: center)
+        }
+
+        func updateUIView(_ anchor: ToastWindowAnchor, context: Context) {
+            anchor.update(
+                position: position,
+                isPresented: isPresented,
+                environment: context.environment,
+            )
+        }
+    }
+
+    /// 떠 있는 창은 SwiftUI 계층 밖이라 환경(색 구성·글자 크기·테마)을 직접 넘긴다.
+    private struct ToastWindowRoot: View {
+        let center: ToastCenter
+        let position: ToastPosition
+        let environment: EnvironmentValues
+        let bottomObstruction: () -> CGFloat
+        let onHittableFramesChange: ([CGRect]) -> Void
+
+        var body: some View {
+            @Bindable var center = center
+            ToastOverlayView(
+                toasts: $center.toasts,
+                position: position,
+                bottomObstruction: bottomObstruction,
+                onFinish: { center.didFinish() },
+            )
+            .onPreferenceChange(HittableFramesPreferenceKey.self) { onHittableFramesChange($0) }
+            .environment(\.self, environment)
+        }
+    }
+
+    private final class ToastWindowAnchor: UIView {
+        private let toastCenter: ToastCenter
+        private var position = ToastPosition.bottom
+        private var isPresented = false
+        private var environment = EnvironmentValues()
+        private var overlayWindow: PassthroughWindow?
+        private var hostingController: StatusBarForwardingHostingController<ToastWindowRoot>?
+
+        init(center: ToastCenter) {
+            self.toastCenter = center
+            super.init(frame: .zero)
+        }
+
+        @available(*, unavailable)
+        required init?(coder _: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+
+        override func didMoveToWindow() {
+            super.didMoveToWindow()
+            if let scene = window?.windowScene {
+                if overlayWindow?.windowScene !== scene {
+                    tearDown()
+                    overlayWindow = PassthroughWindow(windowScene: scene)
+                }
+                updateWindow()
+            } else {
+                tearDown()
+            }
+        }
+
+        func update(position: ToastPosition, isPresented: Bool, environment: EnvironmentValues) {
+            self.position = position
+            self.isPresented = isPresented
+            self.environment = environment
             updateWindow()
-        } else {
-            tearDown()
         }
-    }
 
-    func update(position: ToastPosition, isPresented: Bool, environment: EnvironmentValues) {
-        self.position = position
-        self.isPresented = isPresented
-        self.environment = environment
-        updateWindow()
-    }
+        private func updateWindow() {
+            guard let overlayWindow else { return }
+            guard isPresented else {
+                overlayWindow.isHidden = true
+                overlayWindow.rootViewController = nil
+                hostingController = nil
+                return
+            }
+            let root = ToastWindowRoot(
+                center: toastCenter,
+                position: position,
+                environment: environment,
+                bottomObstruction: { [weak self] in self?.bottomObstruction() ?? 0 },
+                onHittableFramesChange: { [weak overlayWindow] frames in
+                    overlayWindow?.hittableFrames = frames
+                },
+            )
+            if let hostingController {
+                hostingController.rootView = root
+            } else {
+                let controller = StatusBarForwardingHostingController(rootView: root)
+                controller.view.backgroundColor = .clear
+                overlayWindow.rootViewController = controller
+                hostingController = controller
+            }
+            hostingController?.sourceWindow = window
+            // 상태 표시줄 글자색이 앱 창과 같도록 (`.preferredColorScheme`은 앱 창에 걸린다).
+            overlayWindow.overrideUserInterfaceStyle = window?.overrideUserInterfaceStyle
+                ?? .unspecified
+            overlayWindow.isHidden = false
+            hostingController?.setNeedsStatusBarAppearanceUpdate()
+        }
 
-    private func updateWindow() {
-        guard let overlayWindow else { return }
-        guard isPresented else {
-            overlayWindow.isHidden = true
-            overlayWindow.rootViewController = nil
-            hostingController = nil
-            return
+        /// 앱 창 맨 앞 화면에 보이는 탭 바가 화면 아래에서 차지하는 높이. 없으면 0.
+        /// 떠 있는 창은 앱의 안전 영역을 모르므로 직접 찾는다.
+        private func bottomObstruction() -> CGFloat {
+            guard let window, var front = window.rootViewController else { return 0 }
+            while let presented = front.presentedViewController, !presented.isBeingDismissed {
+                front = presented
+            }
+            guard let tabBar = Self.visibleTabBar(in: front.view) else { return 0 }
+            let top = tabBar.convert(tabBar.bounds, to: window).minY
+            return max(window.bounds.height - top, 0)
         }
-        let root = ToastWindowRoot(
-            center: toastCenter,
-            position: position,
-            environment: environment,
-            bottomObstruction: { [weak self] in self?.bottomObstruction() ?? 0 },
-            onHittableFramesChange: { [weak overlayWindow] frames in
-                overlayWindow?.hittableFrames = frames
-            },
-        )
-        if let hostingController {
-            hostingController.rootView = root
-        } else {
-            let controller = StatusBarForwardingHostingController(rootView: root)
-            controller.view.backgroundColor = .clear
-            overlayWindow.rootViewController = controller
-            hostingController = controller
-        }
-        hostingController?.sourceWindow = window
-        // 상태 표시줄 글자색이 앱 창과 같도록 (`.preferredColorScheme`은 앱 창에 걸린다).
-        overlayWindow.overrideUserInterfaceStyle = window?.overrideUserInterfaceStyle
-            ?? .unspecified
-        overlayWindow.isHidden = false
-        hostingController?.setNeedsStatusBarAppearanceUpdate()
-    }
 
-    /// 앱 창 맨 앞 화면에 보이는 탭 바가 화면 아래에서 차지하는 높이. 없으면 0.
-    /// 떠 있는 창은 앱의 안전 영역을 모르므로 직접 찾는다.
-    private func bottomObstruction() -> CGFloat {
-        guard let window, var front = window.rootViewController else { return 0 }
-        while let presented = front.presentedViewController, !presented.isBeingDismissed {
-            front = presented
-        }
-        guard let tabBar = Self.visibleTabBar(in: front.view) else { return 0 }
-        let top = tabBar.convert(tabBar.bounds, to: window).minY
-        return max(window.bounds.height - top, 0)
-    }
-
-    private static func visibleTabBar(in view: UIView) -> UITabBar? {
-        guard !view.isHidden, view.alpha > 0.01 else { return nil }
-        if let tabBar = view as? UITabBar {
-            return tabBar
-        }
-        for subview in view.subviews.reversed() {
-            if let tabBar = visibleTabBar(in: subview) {
+        private static func visibleTabBar(in view: UIView) -> UITabBar? {
+            guard !view.isHidden, view.alpha > 0.01 else { return nil }
+            if let tabBar = view as? UITabBar {
                 return tabBar
             }
+            for subview in view.subviews.reversed() {
+                if let tabBar = visibleTabBar(in: subview) {
+                    return tabBar
+                }
+            }
+            return nil
         }
-        return nil
-    }
 
-    private func tearDown() {
-        overlayWindow?.isHidden = true
-        overlayWindow?.rootViewController = nil
-        overlayWindow = nil
-        hostingController = nil
+        private func tearDown() {
+            overlayWindow?.isHidden = true
+            overlayWindow?.rootViewController = nil
+            overlayWindow = nil
+            hostingController = nil
+        }
     }
-}
+#endif
 
 // MARK: - Toast Overlay View
 

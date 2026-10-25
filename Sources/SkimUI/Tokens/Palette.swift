@@ -1,5 +1,9 @@
 import SwiftUI
-import UIKit
+#if canImport(UIKit)
+    import UIKit
+#else
+    import AppKit
+#endif
 
 /// 색 토큰. 면·글자는 iOS 시스템 회색 체계(그룹 바탕 + 카드), 색은 iOS 위젯 시안에서 뽑은 화사한 색.
 /// 라이트 색은 같은 색상(hue)에서 명도만 내려, 흰 바탕 대비를 같은 계열 iOS 라이트 시스템 색에 맞췄다
@@ -135,23 +139,46 @@ extension Color {
         darkAlpha: Double = 1,
         p3: Bool = false,
     ) {
-        self.init(uiColor: UIColor { @Sendable traits in
-            traits.userInterfaceStyle == .dark
-                ? UIColor(hex: dark, alpha: darkAlpha, p3: p3)
-                : UIColor(hex: light, alpha: lightAlpha, p3: p3)
-        })
+        #if canImport(UIKit)
+            self.init(uiColor: UIColor { @Sendable traits in
+                traits.userInterfaceStyle == .dark
+                    ? UIColor(hex: dark, alpha: darkAlpha, p3: p3)
+                    : UIColor(hex: light, alpha: lightAlpha, p3: p3)
+            })
+        #else
+            self.init(nsColor: NSColor(name: nil) { @Sendable appearance in
+                appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
+                    ? NSColor(hex: dark, alpha: darkAlpha, p3: p3)
+                    : NSColor(hex: light, alpha: lightAlpha, p3: p3)
+            })
+        #endif
     }
 }
 
-extension UIColor {
-    convenience nonisolated init(hex: UInt32, alpha: Double, p3: Bool = false) {
-        let red = CGFloat((hex >> 16) & 0xFF) / 255
-        let green = CGFloat((hex >> 8) & 0xFF) / 255
-        let blue = CGFloat(hex & 0xFF) / 255
-        if p3 {
-            self.init(displayP3Red: red, green: green, blue: blue, alpha: alpha)
-        } else {
-            self.init(red: red, green: green, blue: blue, alpha: alpha)
+#if canImport(UIKit)
+    extension UIColor {
+        nonisolated convenience init(hex: UInt32, alpha: Double, p3: Bool = false) {
+            let red = CGFloat((hex >> 16) & 0xFF) / 255
+            let green = CGFloat((hex >> 8) & 0xFF) / 255
+            let blue = CGFloat(hex & 0xFF) / 255
+            if p3 {
+                self.init(displayP3Red: red, green: green, blue: blue, alpha: alpha)
+            } else {
+                self.init(red: red, green: green, blue: blue, alpha: alpha)
+            }
         }
     }
-}
+#else
+    extension NSColor {
+        nonisolated convenience init(hex: UInt32, alpha: Double, p3: Bool = false) {
+            let red = CGFloat((hex >> 16) & 0xFF) / 255
+            let green = CGFloat((hex >> 8) & 0xFF) / 255
+            let blue = CGFloat(hex & 0xFF) / 255
+            if p3 {
+                self.init(displayP3Red: red, green: green, blue: blue, alpha: alpha)
+            } else {
+                self.init(srgbRed: red, green: green, blue: blue, alpha: alpha)
+            }
+        }
+    }
+#endif

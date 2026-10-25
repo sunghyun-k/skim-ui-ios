@@ -8,7 +8,7 @@
 **A tactile SwiftUI design system for utility apps.** Quiet gray surfaces, one accent color,
 and controls that respond the instant you touch them.
 
-iOS 18+ · Swift 6.2 · Light & Dark · Liquid Glass on iOS 26 · MIT
+iOS 18+ · macOS 26+ · Swift 6.2 · Light & Dark · Liquid Glass on iOS 26 · MIT
 
 ## Built to be touched
 

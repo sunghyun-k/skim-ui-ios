@@ -50,7 +50,9 @@ public struct Storybook: View {
                     .padding(.bottom, Space.s)
             }
             .navigationTitle("SkimUI")
-            .navigationBarTitleDisplayMode(.inline)
+            #if os(iOS)
+                .navigationBarTitleDisplayMode(.inline)
+            #endif
         }
         .tint(Palette.ink1)
     }
@@ -268,7 +270,9 @@ public struct Storybook: View {
             }
             Field("Amount", isOptional: true) {
                 TextField("0", text: $amount)
+                #if os(iOS)
                     .keyboardType(.numberPad)
+                #endif
                     .textFieldStyle(.field(unit: "USD", large: true))
             }
             FieldSlider("Limit", selection: $limit, steps: [1, 3, 5, 10, 20]) {
@@ -286,17 +290,20 @@ public struct Storybook: View {
                     presentToast(ToastValue(title: "Copied to clipboard", type: .success))
                 }
                 .buttonStyle(.secondary(.small))
-                // 토스트가 떠 있는 동안 상태 표시줄을 숨긴 커버가 열렸다 닫혀도 상태 표시줄이 따라가는지.
-                Button("Toast over a cover") {
-                    presentToast(ToastValue(
-                        title: "Status bar follows the app",
-                        message: "A cover hides it and closes in a second.",
-                        duration: 5,
-                    ))
-                    isCovering = true
-                }
-                .buttonStyle(.secondary(.small))
+                #if os(iOS)
+                    // 토스트가 떠 있는 동안 상태 표시줄을 숨긴 커버가 열렸다 닫혀도 상태 표시줄이 따라가는지.
+                    Button("Toast over a cover") {
+                        presentToast(ToastValue(
+                            title: "Status bar follows the app",
+                            message: "A cover hides it and closes in a second.",
+                            duration: 5,
+                        ))
+                        isCovering = true
+                    }
+                    .buttonStyle(.secondary(.small))
+                #endif
             }
+            #if os(iOS)
             .fullScreenCover(isPresented: $isCovering) {
                 Text("Status bar hidden")
                     .textRole(.title)
@@ -309,6 +316,7 @@ public struct Storybook: View {
                         isCovering = false
                     }
             }
+            #endif
             Banner(icon: .warning, text: "Sync failed. Try again later.", tone: .caution)
             Banner(icon: .info, text: "Everything is up to date.")
             Banner(
