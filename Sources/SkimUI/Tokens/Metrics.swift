@@ -10,7 +10,7 @@ public enum Space {
     public static let xl: CGFloat = 20
     public static let xxl: CGFloat = 28
     public static let xxxl: CGFloat = 40
-    /// 화면 좌우 여백.
+    /// 화면 좌우 여백의 대체값. 화면 가장자리에는 `systemMargins()`·`systemScrollMargins()` 를 쓴다(기기마다 다름).
     public static let gutter: CGFloat = 16
 }
 
