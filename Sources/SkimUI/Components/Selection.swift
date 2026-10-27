@@ -66,30 +66,35 @@ public struct SelectChip: View {
     }
 }
 
-/// 가로로 미는 칩 줄. `systemMargins()` 로 띄운 화면 안에 두면 화면 가장자리까지 넘치게 그리고, 칩은 시스템 여백에서 시작한다.
+/// 가로로 미는 칩 줄. 놓인 자리에서 창의 안전 영역 가장자리까지 넘치게 그리고, 첫 칩은 놓인 자리에서 시작한다.
+/// 부모가 `systemMargins()` 로 띄웠든 고정 여백으로 띄웠든 실제 거리를 재므로 화면 밖으로 넘치지 않는다. 시트·분할 열 안에서는
+/// 그 끝까지만 넘친다. 옆에 다른 뷰가 나란히 있으면 그 위로도 넘치니 화면 폭을 차지하는 줄에 쓴다.
 public struct ChipScroller<Content: View>: View {
     let content: Content
-    @State private var margins = EdgeInsets(
-        top: 0,
-        leading: SystemMargin.fallback,
-        bottom: 0,
-        trailing: SystemMargin.fallback,
+    /// 재기 전에는 예전처럼 부모가 16 으로 띄웠다고 본다.
+    @State private var bleed = SafeEdgeDistance(
+        left: SystemMargin.fallback,
+        right: SystemMargin.fallback,
     )
+    @Environment(\.layoutDirection) private var layoutDirection
 
     public init(@ViewBuilder content: () -> Content) {
         self.content = content()
     }
 
     public var body: some View {
+        let rtl = layoutDirection == .rightToLeft
+        let leading = rtl ? bleed.right : bleed.left
+        let trailing = rtl ? bleed.left : bleed.right
         ScrollView(.horizontal) {
             HStack(spacing: 6) { content }
         }
         .scrollIndicators(.hidden)
-        .contentMargins(.leading, margins.leading, for: .scrollContent)
-        .contentMargins(.trailing, margins.trailing, for: .scrollContent)
-        .padding(.leading, -margins.leading)
-        .padding(.trailing, -margins.trailing)
-        .onGeometryChange(for: EdgeInsets.self) { $0.systemMargins } action: { margins = $0 }
+        .contentMargins(.leading, leading, for: .scrollContent)
+        .contentMargins(.trailing, trailing, for: .scrollContent)
+        .padding(.leading, -leading)
+        .padding(.trailing, -trailing)
+        .onSafeEdgeDistanceChange { bleed = $0 }
     }
 }
 
