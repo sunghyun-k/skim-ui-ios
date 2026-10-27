@@ -91,7 +91,7 @@ struct UsageScreen: View {
                 SteppedSlider(selection: $limit, steps: Array(1 ... 7)) { "\($0)GB" }
                     .card()
             }
-            .padding(.horizontal, Space.gutter)
+            .systemMargins()
         }
         .screenBackground()
         .bottomBar {
@@ -99,7 +99,7 @@ struct UsageScreen: View {
                 presentToast(ToastValue(title: "Saved", type: .success))
             }
             .buttonStyle(.floating)
-            .padding(.horizontal, Space.gutter)
+            .systemMargins()
         }
     }
 }
@@ -170,6 +170,7 @@ Touches outside a toast reach the app underneath, and the status bar keeps follo
 | `AccentTheme` | The one thing that differs per app |
 | `TextRole` | `.textRole(.hero)` … `.caption` — SF Pro, Dynamic Type, tight tracking, monospaced digits |
 | `Space`, `Radius` | 4pt grid; continuous corners (`card` 26, `inner` 15, `track` 12.5, `control` 9) |
+| Screen margins | `.systemMargins()`, `.systemScrollMargins()` (the system's container margins: 16 or 20 by device and orientation, uneven on a folded iPhone Duo; 16 before iOS 27.1), `GeometryProxy.systemMargins`. For full-screen media with hidden bars: `.occlusionAwareLayout()` on the container and `.systemMarginsAvoidingOcclusion()` on each bar, which keeps clear of the camera only where a bar meets it. `Space.gutter` (fixed 16) is deprecated |
 | `Animation` | `.strongOut`, `.fill`, `.press`, `.roll`, `.soft` |
 | `Icon`, `IconView` | Hand-drawn 24pt template icons |
 | `Tone` | `neutral` · `calm` · `caution` · `alert` → `color`, `fillColor`, `isColored` |

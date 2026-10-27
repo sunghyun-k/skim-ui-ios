@@ -66,9 +66,15 @@ public struct SelectChip: View {
     }
 }
 
-/// 가로로 미는 칩 줄. 화면 가장자리까지 넘치게 그리고 안쪽 여백은 화면 여백과 맞춘다.
+/// 가로로 미는 칩 줄. `systemMargins()` 로 띄운 화면 안에 두면 화면 가장자리까지 넘치게 그리고, 칩은 시스템 여백에서 시작한다.
 public struct ChipScroller<Content: View>: View {
     let content: Content
+    @State private var margins = EdgeInsets(
+        top: 0,
+        leading: SystemMargin.fallback,
+        bottom: 0,
+        trailing: SystemMargin.fallback,
+    )
 
     public init(@ViewBuilder content: () -> Content) {
         self.content = content()
@@ -77,10 +83,13 @@ public struct ChipScroller<Content: View>: View {
     public var body: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 6) { content }
-                .padding(.horizontal, Space.gutter)
         }
         .scrollIndicators(.hidden)
-        .padding(.horizontal, -Space.gutter)
+        .contentMargins(.leading, margins.leading, for: .scrollContent)
+        .contentMargins(.trailing, margins.trailing, for: .scrollContent)
+        .padding(.leading, -margins.leading)
+        .padding(.trailing, -margins.trailing)
+        .onGeometryChange(for: EdgeInsets.self) { $0.systemMargins } action: { margins = $0 }
     }
 }
 

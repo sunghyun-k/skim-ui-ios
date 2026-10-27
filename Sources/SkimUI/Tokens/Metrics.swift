@@ -10,7 +10,12 @@ public enum Space {
     public static let xl: CGFloat = 20
     public static let xxl: CGFloat = 28
     public static let xxxl: CGFloat = 40
-    /// 화면 좌우 여백의 대체값. 화면 가장자리에는 `systemMargins()`·`systemScrollMargins()` 를 쓴다(기기마다 다름).
+    /// 예전 화면 좌우 여백(16 고정).
+    @available(
+        *,
+        deprecated,
+        message: "화면 가장자리는 systemMargins()·systemScrollMargins() 를 쓴다(기기·방향마다 16·20, iPhone Duo 는 좌우가 다르다). 카드 안쪽처럼 화면 가장자리가 아닌 곳은 Space.l."
+    )
     public static let gutter: CGFloat = 16
 }
 

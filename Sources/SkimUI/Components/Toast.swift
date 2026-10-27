@@ -354,6 +354,8 @@ private struct ToastOverlayView: View {
         // 안전 영역(아래는 키보드 포함)과 탭 바 중 높은 쪽 위에 놓는다.
         GeometryReader { proxy in
             stack
+                .padding(.leading, proxy.safeAreaInsets.leading + proxy.systemMargins.leading)
+                .padding(.trailing, proxy.safeAreaInsets.trailing + proxy.systemMargins.trailing)
                 .padding(.top, proxy.safeAreaInsets.top + 8)
                 .padding(.bottom, max(proxy.safeAreaInsets.bottom, obstruction) + 8)
                 .frame(
@@ -391,7 +393,6 @@ private struct ToastOverlayView: View {
                 .task { await autoDismiss(item) }
             }
         }
-        .padding(.horizontal, 16)
         .frame(maxWidth: .infinity)
     }
 

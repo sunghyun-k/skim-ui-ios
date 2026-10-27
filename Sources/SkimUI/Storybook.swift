@@ -38,7 +38,7 @@ public struct Storybook: View {
                     group("Feedback") { feedback }
                     group("Buttons") { buttons }
                 }
-                .padding(.horizontal, Space.gutter)
+                .systemMargins()
                 .padding(.vertical, Space.xl)
             }
             .screenBackground()
@@ -46,7 +46,7 @@ public struct Storybook: View {
                 Button("Continue") {}
                     .buttonStyle(.floating)
                     .disabled(!floatingEnabled)
-                    .padding(.horizontal, Space.gutter)
+                    .systemMargins()
                     .padding(.bottom, Space.s)
             }
             .navigationTitle("SkimUI")

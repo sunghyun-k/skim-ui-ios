@@ -30,6 +30,7 @@ xcodebuild build -scheme skim-ui-ios -destination 'generic/platform=macOS' -quie
 ## 규칙
 
 - 외부 패키지 의존성을 두지 않는다.
+- 화면 가장자리 여백은 고정값이 아니라 시스템 여백을 쓴다: `systemMargins()`·`systemScrollMargins()`·`GeometryProxy.systemMargins`(27.1 전에는 16). 막대를 숨긴 전체 화면은 `occlusionAwareLayout()` + 막대마다 `systemMarginsAvoidingOcclusion()`. `Space.gutter` 는 deprecated 다(쓰는 앱이 버전을 올릴 때 경고로 옮길 곳을 찾게). 카드 안쪽·알약 단추 안쪽처럼 화면 가장자리가 아닌 여백은 `Space` 고정값.
 - 화면 코드에서 시스템 색을 직접 쓰지 않는다 → `Palette`, `.textRole(_:)`.
 - 아이콘은 `Icon`을 먼저 쓰고, 맞는 모양이 없을 때만 SF Symbols.
 - 테마색은 `AccentTheme.current`에서만 나온다. 컴포넌트에 라임 같은 값을 박지 않는다.

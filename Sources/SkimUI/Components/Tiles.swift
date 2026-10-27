@@ -228,7 +228,8 @@ private struct TileButton<Thumbnail: View>: View {
                 ) { hues[$0] }
             }
             .card()
-            .padding(Space.gutter)
+            .padding(.vertical, Space.l)
+            .systemMargins()
             .frame(maxHeight: .infinity)
             .screenBackground()
         }
