@@ -1,3 +1,4 @@
+import Foundation
 import SwiftUI
 
 extension View {
@@ -7,7 +8,7 @@ extension View {
     /// 고정 여백은 안전 영역에서 재므로 이런 기기에서 어긋난다. iOS·macOS 27.1 전에는 16 으로 띄운다.
     @ViewBuilder
     public func systemMargins(_ edges: Edge.Set = .horizontal) -> some View {
-        if #available(iOS 27.1, macOS 27.1, *) {
+        if SystemMargin.isReadable, #available(iOS 27.1, macOS 27.1, *) {
             contentMargins(for: .container, edges: edges)
         } else {
             padding(edges, SystemMargin.fallback)
@@ -42,7 +43,7 @@ extension View {
 extension GeometryProxy {
     /// 이 뷰가 놓인 컨테이너의 가로 시스템 여백(안전 영역 안쪽에서 잰다). 27.1 전에는 16.
     public var systemMargins: EdgeInsets {
-        if #available(iOS 27.1, macOS 27.1, *) {
+        if SystemMargin.isReadable, #available(iOS 27.1, macOS 27.1, *) {
             return contentMargins(for: .container, edges: .horizontal)
         }
         return EdgeInsets(
@@ -57,6 +58,34 @@ extension GeometryProxy {
 enum SystemMargin {
     /// iOS·macOS 27.1 전, 시스템 여백을 읽을 수 없을 때.
     static let fallback: CGFloat = 16
+
+    /// 시스템 여백 API(`contentMargins(for:edges:)`)를 이 기기에서 실제로 부를 수 있는지.
+    ///
+    /// SDK 는 27.1 부터 있다고 하지만, 일부 iOS 27.2.0 기기에는 심볼이 없어 `#available` 을 통과한 뒤
+    /// 빈 주소를 불러 앱이 시작하자마자 죽었다(2026-11, MiniFolder 2.21.0 Crashlytics). 부르기 전에 심볼이 있는지 본다.
+    static let isReadable: Bool = {
+        guard #available(iOS 27.1, macOS 27.1, *) else { return false }
+        return hasSymbols(
+            // View.contentMargins(for:edges:alignment:) 와 그 반환 타입(opaque type descriptor)
+            "$s7SwiftUI4ViewPAAE14contentMargins3for5edges9alignmentQrAA18ContentMarginGuideV_AA4EdgeO3SetVAA9AlignmentVSgtF",
+            "$s7SwiftUI4ViewPAAE14contentMargins3for5edges9alignmentQrAA18ContentMarginGuideV_AA4EdgeO3SetVAA9AlignmentVSgtFQOMQ",
+            // GeometryProxy.contentMargins(for:edges:)
+            "$s7SwiftUI13GeometryProxyVAAE14contentMargins3for5edgesAA10EdgeInsetsVAA18ContentMarginGuideV_AA0I0O3SetVtF",
+        )
+    }()
+
+    /// 가리는 영역 API(`GeometryProxy.reservedRegions`)를 부를 수 있는지. 같은 이유로 심볼을 본다.
+    static let canReadOcclusions: Bool = {
+        guard #available(iOS 27.1, macOS 27.1, *) else { return false }
+        return hasSymbols(
+            "$s7SwiftUI13GeometryProxyV15reservedRegions4kind7options23layoutDirectionBehaviorSayAA14ReservedRegionVGAI4KindV_AI12QueryOptionsVAA06LayoutjK0OtF",
+        )
+    }()
+
+    private static func hasSymbols(_ names: String...) -> Bool {
+        let handle = UnsafeMutableRawPointer(bitPattern: -2) // RTLD_DEFAULT
+        return names.allSatisfy { dlsym(handle, $0) != nil }
+    }
 }
 
 private struct SystemScrollMargins: ViewModifier {
@@ -70,7 +99,7 @@ private struct SystemScrollMargins: ViewModifier {
 
     func body(content: Content) -> some View {
         Group {
-            if #available(iOS 27.1, macOS 27.1, *) {
+            if SystemMargin.isReadable, #available(iOS 27.1, macOS 27.1, *) {
                 content.onGeometryChange(for: EdgeInsets.self) { proxy in
                     proxy.contentMargins(for: .container, edges: edges)
                 } action: { margins = $0 }
@@ -144,7 +173,7 @@ private struct OcclusionAwareLayout: ViewModifier {
     }
 
     private static func occlusions(_ proxy: GeometryProxy) -> [CGRect] {
-        guard #available(iOS 27.1, macOS 27.1, *) else { return [] }
+        guard SystemMargin.canReadOcclusions, #available(iOS 27.1, macOS 27.1, *) else { return [] }
         let origin = proxy.frame(in: .global).origin
         return proxy.reservedRegions(kind: .occlusion, layoutDirectionBehavior: .fixed)
             .filter(\.isActive)
